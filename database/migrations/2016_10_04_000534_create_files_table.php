@@ -17,10 +17,7 @@ class CreateFilesTable extends Migration
             $table->increments('id');
             $table->timestamps();
             $table->softDeletes();
-<<<<<<< HEAD
             $table->string('name');
-=======
->>>>>>> b1af922ae2ea4503db11d7374397e24d4ba50104
             $table->integer('owner')->unsigned();
             $table->integer('parent')->unsigned()->nullable();
             $table->boolean('isFolder')->default(false);
