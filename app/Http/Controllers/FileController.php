@@ -8,6 +8,7 @@ use App\Http\Requests;
 use App\Version;
 use App\Share;
 use Carbon\Carbon;
+
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
@@ -17,80 +18,143 @@ use Illuminate\Support\Facades\Log;
 
 class FileController extends Controller{
 
-    /*     
-    This method is provided to make sure that the user has a folder before
-    performing operations on it. This method should always return true and
-    in case it doesn't, it means that the user is a guest or that there was
-    a critical error. 
-    The caller should act accordingly
-    */
+	  /*     
+	  This method is provided to make sure that the user has a folder before
+	  performing operations on it. This method should always return true and
+	  in case it doesn't, it means that the user is a guest or that there was
+	  a critical error. 
+	  The caller should act accordingly
+	  */
  	private function ensureUserFolder() {
   
-  	if(Auth::check()){
+	  	if(Auth::check()){
 
-  		$id = Auth::user()->id;
-			$exists = Storage::disk('local')->exists($id);
-		
-			if(!$exists){
+	  		$id = Auth::user()->id;
+				$exists = Storage::disk('local')->exists($id);
+			
+				if(!$exists){
 
-				if(!Storage::disk('local')->makeDirectory($id)){
+					if(!Storage::disk('local')->makeDirectory($id)){
 
-					Log::critical("Could not create directory for user " . $id );
+						Log::critical("Could not create directory for user " . $id );
+						return false;
+					}
+
+					return true;
+				}
+
+				if(!File::isDirectory(storage_path("app/" . $id))){
+
+					Log::critical("User directory is not a directory for user: " . $id);
 					return false;
 				}
 
+				return true;	
+		  } // Auth::check
+
+		  Log::info('upload rejected as the user is not authenticaded');
+	  	return false;
+	}
+
+	private function ensureUserReadPermission(\App\File $file) {
+	  	
+	  	if($file->publicRead)
+	  		return true;
+
+	  	if($this->ensureUserOwnerPermission($file))
+	  		return true;
+
+	  	if(Auth::check()){
+	  		$id = Auth::user()->id;
+  
+	  		// We search for not expired shares
+	  		if(Share::where('idFile', $file->id)->where('idUser', $id)
+	  			->where('dueDate', '>', Carbon::now())->exists())
+	  				return true;
+	  		
+	  		// Last we check for not expiring shares
+	  		if(Share::where('idFile', $file->id)->where('idUser', $id)
+	  			->where('dueDate', null)->exists())
+	  				return true;
+
+		} // Auth::check
+
+  		return false;
+ 	}
+
+	private function ensureUserWritePermission(\App\File $file) {
+
+		if($this->ensureUserOwnerPermission($file))
+	  		return true;  	
+
+	  	if(!Auth::check() || !$this->ensureUserReadPermission($file))
+	  		return false;
+
+		$id = Auth::user()->id;
+
+		$share = Share::where('idFile', $file->id)
+			->where('idUser', $id)->where('dueDate', '>', Carbon::now())->first();
+
+		// We search for not expired shares
+		if( $share != null && $share->hasWritePermission() )
 				return true;
-			}
+		  	
+	  	$share = Share::where('idFile', $file->id)->where('idUser', $id)
+	  			->where('dueDate', null)->first();
+	  	
+	  	// Last we check for not expiring shares
+	  	if($share != null && $share->hasWritePermission())
+	  		return true;
 
-			if(!File::isDirectory(storage_path("app/" . $id))){
+	  	return false;
+	}
 
-				Log::critical("User directory is not a directory for user: " . $id);
-				return false;
-			}
-
-			return true;	
-	  } // Auth::check
-
-	  Log::info('upload rejected as the user is not authenticaded');
-  	return false;
-  }
-
-  private function ensureUserReadPermission(\App\File $file) {
+	private function ensureUserOwnerPermission(\App\File $file) {
   	
-  	if($file->publicRead)
-  		return true;
+  		if(!Auth::check())
+  			return false;
 
-  	if(Auth::check()){
-  		$id = Auth::user()->id;
+ 		$id = Auth::user()->id;
   		
-  		// If the user is the owner then he has full access
-  		if($file->owner == $id)
-  		  return true;
+		// If the user is the owner then he has full access
+		if($file->owner == $id)
+		  return true;
 
-  		// We search for not expired shares
-  		if(Share::where('idFile', $file->id)->where('idUser', $id)
-  			->where('dueDate', '>', Carbon::now())->exists())
-  				return true;
-  		
-  		// Last we check for not expiring shares
-  		if(Share::where('idFile', $file->id)->where('idUser', $id)
-  			->where('dueDate', null)->exists())
-  				return true;
+		return false;
+  	}
 
-	  } // Auth::check
+	private function responseDownload(Version $version){
+  		$path = $version->path;
 
-  	return false;
-  }
+		$exists = Storage::disk('local')->exists($path);
 
-  function uploadForm(Request $request){
+		if(!$exists){
+			Log::critical('The version requested is not present on the disk but is on 
+				the db. path:' . $path);
+			abort(500);
+		}
+
+	 	return response()->download(storage_path("app/" . $path), $version->file->
+	 		first()->name);
+  	}
+
+	function uploadForm(Request $request){
 
 		return view('file.upload');
 	}
 
 	function show(Request $request, $fileId){
 
-		abort(501);
-		return "";
+		$file = \App\File::where('id', $fileId)->firstOrFail();
+
+		if(!$this->ensureUserReadPermission($file))
+			abort(403);
+
+		$versions = Version::where('idFile', $file->id)
+			->orderBy('updated_at', 'desc')->get();
+
+
+		return view('file.show', ['file' => $file, 'versions' => $versions]);
 	}
 
 	function upload(Request $request){
@@ -114,7 +178,7 @@ class FileController extends Controller{
 
 		// We remove the extension where we save the file
 		$path = $file->storeAs( $userID, 
-			preg_replace('/\\.[^.\\s]{3,4}$/', '', $file->hashName()) );
+			preg_replace('/\\.[^.\\s]{1,5}$/', '', $file->hashName()) );
 
 		$name = $file->getClientOriginalName();
 
@@ -123,6 +187,15 @@ class FileController extends Controller{
 
 		// If there is not a model available. Therefore we need to create one
 		if($fileModel == null){
+
+			// There is a really special case where the user upload a deleted
+			// file. We fix it here
+			$del = \App\File::onlyTrashed()->where('name', $name)
+			->where('owner', $userID)->first();
+
+			if($del != null){
+				$del->forceDelete();
+			}
 
 			$fileModel = new \App\File;
 			$fileModel->name = $name;
@@ -155,63 +228,183 @@ class FileController extends Controller{
 			abort(403);
 
 		$version = Version::where('idFile', $file->id)
-			->orderBy('created_at', 'desc')->first();
+			->orderBy('updated_at', 'desc')->first();
 
 		if($version == null){
 			Log::critical('There is a file without versions');
 			abort(500);
 		}
 
-		$path = $version->path;
-
-		$exists = Storage::disk('local')->exists($path);
-
-		if(!$exists){
-			Log::critical('The version requested is not present on the disk but is on 
-				the db. path:' . $path);
-			abort(500);
-		}
-
-	 	return response()->download(storage_path("app/" . $path), $file->name);
+		return $this->responseDownload($version);	
 	}
 
 	function downloadVersion(Request $request, $file_id, $version_id){
+		//First we validate that the file and version actually exist
+		$file = \App\File::findOrFail($file_id);
+		$version = \App\Version::findOrFail($version_id);
 
-		abort(501);
-		return "";
+		//Then we validate that the version and file actually match
+		if($file->id != $version->idFile){
+			//They don't match and therefore the requested file version does not exist
+			abort(404);
+		}
+
+		if(!$this->ensureUserReadPermission($file))
+			abort(403);
+
+		return $this->responseDownload($version);	
 	}
 
 	function uploadVersion(Request $request, $file_id){
 
-		if(!$this->ensureFolder())
-			abort(500);
+		$this->validate($request, [
+    	    'file' => 'required|file',
+	    ]);
 
-		abort(501);
-		return "";
+	   	$uploadedFile = $request->file('file');
+
+	    if (!$uploadedFile->isValid()) {
+			return back()->withErrors([
+				'upload' =>'There was a problem while uploading the file version'
+			]);
+		}
+
+		// Even if we validated on the get request we can't ensure that the
+		// user played fair and didn´t change the id. We must validate. 
+		$fileModel = \App\File::where('id', $file_id)->firstOrFail();
+
+		if(!$this->ensureUserWritePermission($fileModel))
+			abort(403);
+
+		// We remove the extension where we save the file
+
+		$path = $uploadedFile->storeAs( $fileModel->owner, 
+			preg_replace('/\\.[^.\\s]{1,5}$/', '', $uploadedFile->hashName()));
+
+		$version = new Version;
+		$version->idFile = $fileModel->id;
+		$version->path = $path;
+		
+		if(!$version->save()){
+			Log::critical('Could not save version.');
+			abort(500);
+		}
+
+		return redirect()->route('file.show', [$fileModel->id])
+			->with('success', 'Version uploaded successfully');
 	}
 
-	function restore(Request $request, $version_id){
+	function uploadVersionGet(Request $request, $file_id){
+		
+		$file = \App\File::where('id', $file_id)->firstOrFail();
 
-		abort(501);
-		return "";
+		if(!$this->ensureUserWritePermission($file))
+			abort(403);
+
+		return view('file.version.upload', ['file'=>$file]);
+	}
+
+	function restoreVersion(Request $request, $file_id, $version_id){
+		
+		/* 
+		Restoring a version is an easy process. The only thing that needs to be
+		done is changing the updated_at field of the version to match the moment
+		when the user request it to become the main version. This way we don't lose
+		any data. Not even when was the version created and the ones above it.
+		*/
+
+		$file = \App\File::where('id', $file_id)->firstOrFail();
+		$version = Version::where('id', $version_id)->firstOrFail();
+		
+		// We cross check file and version
+		if( $file->id != $version->file()->first()->id )
+			abort(404);
+
+		if(!$this->ensureUserWritePermission($file))
+			abort(403);
+
+		$version->setUpdatedAt(Carbon::now());
+		$version->save();
+		return redirect()->route('file.show', [$version->file()->first()->id])
+			->with('success', 'Version restored');
+	}
+
+	function restoreFile(Request $request, $file_id){
+		
+		/* 
+		Restoring a file means that we will remove the deleted_at field from it.
+		Laravel can manage this process for us, but we take care that we only 
+		restore a trashed file in the query.
+		*/
+
+		$file = \App\File::onlyTrashed()->where('id', $file_id)->firstOrFail();
+		
+		if(!$this->ensureUserWritePermission($file))
+			abort(403);
+
+		$file->restore();
+
+		return redirect()->route('file.show', [$file->id])->with('success', 'File restored');
 	}
 
 	function delete(Request $request, $file_id){
 
-		abort(501);
-		return "";
+		$file = \App\File::where('id', $file_id)->firstOrFail();
+		
+		if(!$this->ensureUserWritePermission($file))
+			abort(403);
+
+		$file->delete();
+
+		return redirect()->route('home')->with('success', 'File moved to trash');
 	}
 	
 	function deleteHard(Request $request, $file_id){
+		/*
+			This is a method where the user can opt for destroying his file for good.
+			As this is as a really dangerous operation with only allowing it from the
+			owner of the file.
+		*/
+		$file = \App\File::where('id', $file_id)->firstOrFail();
 
-		abort(501);
-		return "";
+		if(!$this->ensureUserOwnerPermission($file))
+			abort(403);
+
+		if(!$file->forceDelete()){
+			Log::alert('Could not delete file ' . $file->id);
+			abort(500);
+		}
+
+		return redirect()->route('home')->with('success', 'The file is gone');
 	}
 
 	function deleteVersion(Request $request, $file_id, $version_id){
 
-		abort(501);
-		return "";
+		// This also requires owner permission access as the file is going to
+		// be deleted
+		$file = \App\File::where('id', $file_id)->firstOrFail();
+		$version = \App\Version::where('id', $version_id)->firstOrFail();
+
+		// As usual, we cross check the version with the file
+		if( $file->id != $version->file()->first()->id )
+			abort(404);
+
+		if(!$this->ensureUserOwnerPermission($file))
+			abort(403);
+
+		// Now we validate that there is at least 2 versions
+		if($file->versions()->count() == 1){
+			return back()
+				->with('error', 'This file only has one version. To remove it delete the entire file first');
+		}
+
+		if(!$version->delete()){
+			Log::alert('Could not delete version ' . $version->id);
+			abort(500);
+		}
+
+		return redirect()->route('file.show', [$file->id])
+			->with('success', 'The version is gone');
 	}
 
 }
