@@ -147,6 +147,9 @@ class FileController extends Controller{
 
 		$file = \App\File::where('id', $fileId)->firstOrFail();
 
+		if(!$this->ensureUserReadPermission($file))
+			abort(403);
+
 		$versions = Version::where('idFile', $file->id)
 			->orderBy('updated_at', 'desc')->get();
 
