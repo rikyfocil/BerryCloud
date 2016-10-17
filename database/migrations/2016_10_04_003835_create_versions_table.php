@@ -16,8 +16,7 @@ class CreateVersionsTable extends Migration
         Schema::create('versions', function (Blueprint $table) {
             $table->increments('id');
             $table->timestamps();
-            $table->date('date')->nullable();
-            $table->integer('idFile')->unsigned();
+             $table->integer('idFile')->unsigned();
             $table->string('path');
 
             $table->foreign('idFile')

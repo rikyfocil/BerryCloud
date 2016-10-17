@@ -3,10 +3,17 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class File extends Model {     
 
-	protected $guarded =  ['id', 'owner', 'isFolder', 'publicRead'];
+    use SoftDeletes{
+        forceDelete as concludeForceDelete;
+    }
+	
+    protected $dates = ['deleted_at', 'created_at', 'updated_at'];
+
+    protected $guarded =  ['id', 'owner', 'isFolder', 'publicRead'];
 
 	public function alias()
     {
@@ -36,5 +43,18 @@ class File extends Model {
     public function owner()
     {
         return $this->belongsTo('App\User', 'owner');
+    }
+
+    public function forceDelete()
+    {
+        $versions = $this->versions()->get();
+
+        // To delete dependendencies and ensure a clean file system we delete
+        // the versions before the file
+        foreach ($versions as $version) {
+            $version->delete();
+        }
+
+        return $this->concludeForceDelete();
     }
 }
