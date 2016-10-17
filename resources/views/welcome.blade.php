@@ -1,87 +1,65 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+@extends ('layouts.main')
 
-        <title>Dashboard</title>
+@section ('content')
 
-        <!-- Fonts -->
-        <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
+<div class="jumbotron">
+    <div class="container text-center" id="welcome_info">
+        <div class="col s8 m12">
+            <h1>Keep it simple, your information in one click</h1>
+            <h2>Get all the files wherever you are</h2>
+            <a href="{{ url('/register') }}" class="btn">Register</a>
+        </div>
+        
+    </div>
+</div>
 
-        <!-- Styles -->
-        <style>
-            html, body {
-                background-color: #fff;
-                color: #636b6f;
-                font-family: 'Raleway', sans-serif;
-                font-weight: 100;
-                height: 100vh;
-                margin: 0;
-            }
-
-            .full-height {
-                height: 100vh;
-            }
-
-            .flex-center {
-                align-items: center;
-                display: flex;
-                justify-content: center;
-            }
-
-            .position-ref {
-                position: relative;
-            }
-
-            .top-right {
-                position: absolute;
-                right: 10px;
-                top: 18px;
-            }
-
-            .content {
-                text-align: center;
-            }
-
-            .title {
-                font-size: 84px;
-            }
-
-            .links > a {
-                color: #636b6f;
-                padding: 0 25px;
-                font-size: 12px;
-                font-weight: 600;
-                letter-spacing: .1rem;
-                text-decoration: none;
-                text-transform: uppercase;
-            }
-
-            .m-b-md {
-                margin-bottom: 30px;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="flex-center position-ref full-height">
-            @if (Route::has('login'))
-                <div class="top-right links">
-                    <a href="{{ url('/login') }}">Login</a>
-                    <a href="{{ url('/register') }}">Register</a>
+<div class="container-fluid text-center">
+    <section id="feat">
+        <h2 class="text-center">Why BerryCloud?</h2>
+        <div class="row">
+            <div class="col-sm-6 col-md-3 feats">
+                <div class="circle">
+                    <span class="glyphicon glyphicon-cloud glyph-welcome" aria-hidden="true"></span>
                 </div>
-            @endif
-
-            <div class="content">
-                <div class="title m-b-md">
-                    BerryCloud<br><small>Coming soon</small>
+                <h3>Cloud</h3>
+                <h4>All your files everywhere</h4>
+            </div>
+            <div class="col-sm-6 col-md-3 feats">
+                <div class="circle">
+                    <span class="glyphicon glyphicon-duplicate glyph-welcome" aria-hidden="true"></span>
                 </div>
-
-                <div class="links">
-                    <a href="https://github.com/rikyfocil/BerryCloud">GitHub</a>
+                <h3>Version Control</h3>
+                <h4>All your versions everywhere</h4>
+            </div>
+            <div class="col-sm-6 col-md-3 feats">
+                <div class="circle">
+                    <span class="glyphicon glyphicon-eye-close glyph-welcome" aria-hidden="true"></span>
                 </div>
+                <h3>End to end</h3>
+                <h4>All your files encrypted</h4>
+            </div>
+            <div class="col-sm-6 col-md-3 feats">
+                <div class="circle">
+                    <span class="glyphicon glyphicon-user glyph-welcome" aria-hidden="true"></span>
+                </div>
+                <h3>Share</h3>
+                <h4>Share your files with anyone</h4>
             </div>
         </div>
-    </body>
-</html>
+    </section>
+
+    <!-- <section id="think"> -->
+    <!--     <div class="col&#45;sm&#45;12 col&#45;md&#45;4"> -->
+    <!--         <h2>Rethink the way you work</h2> -->
+    <!--     </div> -->
+    <!-- </section> -->
+
+    
+    <section id="save">
+        <div class="col-sm-12 col-md-4 col-md-push-6">
+            <h2>Save your files with a different point of view</h2>
+        </div>
+    </section>
+</div>
+
+@endsection 
