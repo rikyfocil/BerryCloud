@@ -21,12 +21,19 @@
          <span class = "icon-bar"></span>
       </button>
 		
-    <a class="navbar-brand" href="{{ url('/') }}">
-        <img alt="BerryCloud" src="{{ url('/img/logo.png') }}">
-    </a>
-        <h3 class="navbar-text">BerryCloud</h3>
+        @if(Auth::check())
+            <a class="navbar-brand" href="{{ url('/home') }}">
+                <img alt="BerryCloud" src="{{ url('/img/logo.png') }}">
+            </a>
+            <h3 class="navbar-text">BerryCloud</h3>
+        @else 
+            <a class="navbar-brand" href="{{ url('/') }}">
+                <img alt="BerryCloud" src="{{ url('/img/logo.png') }}">
+            </a>
+            <h3 class="navbar-text">BerryCloud</h3>
+            </div>
+        @endif
    </div>
-   
     @if(Auth::check())
         <div class = "collapse navbar-collapse" id = "example-navbar-collapse">
             <ul class = "nav navbar-nav navbar-right">
@@ -37,9 +44,18 @@
                     </a>
                     
                     <ul class = "dropdown-menu dropdown-menu-right">
-                    <li><a href = "#">Home</a></li>
+                    <li><a href = "{{url('/home')}}">Home</a></li>
                     <li><a href = "#">Settings</a></li>
-                    <li><a href = "#">Log Out</a></li>
+                    <li>
+                        <a href="{{ url('/logout') }}"
+                                    onclick="event.preventDefault();
+                                    document.getElementById('logout-form').submit();">
+                                Logout
+                        </a>
+                        <form id="logout-form" action="{{ url('/logout') }}" method="POST" style="display: none;">
+                                {{ csrf_field() }}
+                        </form>
+                    </li>
                     </ul>
                     
                 </li>

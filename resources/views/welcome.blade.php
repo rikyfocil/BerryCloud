@@ -2,7 +2,7 @@
 
 @section ('content')
 
-<div class="jumbotron">
+<div class="jumbotron" id="welcome-jumbotron">
     <div class="container text-center" id="welcome_info">
         <div class="col s8 m12">
             <h1>Keep it simple, your information in one click</h1>
