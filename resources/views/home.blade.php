@@ -10,7 +10,7 @@
 
 <div class="col-sm-10 col-sm-offset-1">
   <table class="table">
-    
+
     <tr>
       <td>File name</td>
       <td>Options</td>
@@ -19,21 +19,20 @@
     @foreach ($files as $file)
 
       <tr>
-        
+
         <td><a href="{{route('file.show', $file->id)}}">{{$file->name}}</a></td>
         <td>
-          <div class="col-xs-6"> 
+          <div class="col-xs-6">
             {!! Helper::createButton('GET', ['file.download',$file->id], "Download", "btn-success") !!}
           </div>
-          <div class="col-xs-6"> 
+          <div class="col-xs-6">
             {!! Helper::createButton('DELETE', ['file.delete', $file->id], "Delete", "btn-danger") !!}
           </div>
         </td>
       </tr>
-      
+
     @endforeach
 
   </table>
 </div>
 @endsection
-

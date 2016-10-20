@@ -10,7 +10,7 @@ class UsersSeeder extends Seeder
      * @return void
      */
     public function run()
-    {   
+    {
         DB::table('users')->insert([
             'id' => 1,
             'name' => 'Initial User',
