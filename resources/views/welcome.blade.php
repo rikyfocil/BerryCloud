@@ -7,7 +7,7 @@
         <div class="col s8 m12">
             <h1>Keep it simple, your information in one click</h1>
             <h2>Get all the files wherever you are</h2>
-            <a href="{{ url('/register') }}" class="btn">Register</a>
+            <a href="{{ url('/register') }}" class="btn" id="register-button">Register</a>
         </div>
         
     </div>

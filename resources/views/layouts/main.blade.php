@@ -22,12 +22,12 @@
       </button>
 		
         @if(Auth::check())
-            <a class="navbar-brand" href="{{ url('/home') }}">
+            <a class="navbar-brand" href="{{ route('home') }}">
                 <img alt="BerryCloud" src="{{ url('/img/logo.png') }}">
             </a>
             <h3 class="navbar-text">BerryCloud</h3>
         @else 
-            <a class="navbar-brand" href="{{ url('/') }}">
+            <a class="navbar-brand" href="{{ route('/') }}">
                 <img alt="BerryCloud" src="{{ url('/img/logo.png') }}">
             </a>
             <h3 class="navbar-text">BerryCloud</h3>
@@ -45,7 +45,6 @@
                     
                     <ul class = "dropdown-menu dropdown-menu-right">
                     <li><a href = "{{url('/home')}}">Home</a></li>
-                    <li><a href = "#">Settings</a></li>
                     <li>
                         <a href="{{ url('/logout') }}"
                                     onclick="event.preventDefault();

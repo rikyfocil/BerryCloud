@@ -9,7 +9,7 @@ h1,h2,h3,h4,h5,h6 {
     font-weight:300;
 }
 
-.btn, .btn:hover, .btn:visited {
+#register-button{
     background: none;
     border: 0.3em solid #fff;
     color: #fff;
