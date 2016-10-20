@@ -21,7 +21,7 @@
          <span class = "icon-bar"></span>
       </button>
 		
-    <a class="navbar-brand" href="{{ url('/w') }}">
+    <a class="navbar-brand" href="{{ url('/') }}">
         <img alt="BerryCloud" src="{{ url('/img/logo.png') }}">
     </a>
         <h3 class="navbar-text">BerryCloud</h3>
