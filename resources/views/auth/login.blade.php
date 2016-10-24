@@ -7,7 +7,7 @@
   <div class = "login-form-1">
     <h1> Login </h1>
 
-    <form id="login-form" class="text-left" role="form" method="POST" action="{{ url('/login') }}">
+    <form id="login-form" class="text-left" role="form" method="POST" action="{{ route('login') }}">
       {{ csrf_field() }}
 			<div class="login-form-main-message"></div>
 			<div class="main-login-form">

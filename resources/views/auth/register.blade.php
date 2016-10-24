@@ -5,7 +5,7 @@
   <div class="text-center" style="padding:50px 0">
 <div class="login-form-1">
   <h1> Sign Up </h1>
-  <form id="register-form" role="form" method="POST" action="{{ url('/register') }}">
+  <form id="register-form" role="form" method="POST" action="{{ route('register') }}">
       {{ csrf_field() }}
     <div class="login-form-main-message"></div>
     <div class="main-login-form">
@@ -66,7 +66,6 @@
 
         <div class="form-group login-group-checkbox">
           <input type="checkbox" class="" id="reg_agree" name="reg_agree">
-          <label for="reg_agree">I agree with <a href="#">terms & conditions</a></label>
         </div>
       </div>
       <button type="submit" class="login-button"> <p>&#10217;</p> </button>
