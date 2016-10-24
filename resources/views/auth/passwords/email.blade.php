@@ -11,7 +11,7 @@
         </div>
     @endif
   	<div class="login-form-1">
-  		<form class="text-left" role="form" method="POST" action="{{ url('/password/email') }}">
+  		<form class="text-left" role="form" method="POST" action="{{ route('email') }}">
         {{ csrf_field() }}
   			<div class="etc-login-form">
   				<p>When you fill in your registered email address, you will be sent instructions on how to reset your password.</p>
