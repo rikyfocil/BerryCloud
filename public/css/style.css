@@ -10,7 +10,7 @@ h1,h2,h3,h4,h5,h6 {
     font-weight:300;
 }
 
-.btn, .btn:hover, .btn:visited {
+#register-button{
     background: none;
     border: 0.3em solid #fff;
     color: #fff;
@@ -44,7 +44,8 @@ h1,h2,h3,h4,h5,h6 {
     margin: 25% auto;
 }
 
-.jumbotron {
+
+#welcome-jumbotron {
     background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('../img/action.jpeg');
     -webkit-background-size: cover;
     -moz-background-size: cover;
