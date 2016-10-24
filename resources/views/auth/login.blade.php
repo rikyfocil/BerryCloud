@@ -49,7 +49,7 @@
 				<button type="submit" class="login-button"><p>&#10217;</p></button>
 			</div>
 			<div class="etc-login-form">
-				<p>Forgot your password? <a href="{{ url('/password/reset') }}">click here</a></p>
+				<p>Forgot your password? <a href="{{ route('reset') }}">click here</a></p>
 			</div>
 		</form>
     </div>

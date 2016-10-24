@@ -72,7 +72,7 @@
       <button type="submit" class="login-button"> <p>&#10217;</p> </button>
     </div>
     <div class="etc-login-form">
-      <p><a href="#">Already have an account?</a></p>
+      <p><a href="{{ route('login') }}">Already have an account?</a></p>
     </div>
   </form>
 </div>
