@@ -23,6 +23,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->bind('Helper', function ($app) {
+            return new Helper();
+        });
     }
 }
