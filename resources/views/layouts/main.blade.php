@@ -21,6 +21,7 @@
          <span class = "icon-bar"></span>
       </button>
 
+
         @if(Auth::check())
             <a class="navbar-brand" href="{{ route('home') }}">
                 <img alt="BerryCloud" src="{{ asset('/img/logo.png') }}">
@@ -34,6 +35,7 @@
             </div>
         @endif
    </div>
+
     @if(Auth::check())
         <div class = "collapse navbar-collapse" id = "example-navbar-collapse">
             <ul class = "nav navbar-nav navbar-right">
