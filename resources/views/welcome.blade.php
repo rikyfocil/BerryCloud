@@ -2,14 +2,14 @@
 
 @section ('content')
 
-<div class="jumbotron">
+<div class="jumbotron" id="welcome-jumbotron">
     <div class="container text-center" id="welcome_info">
         <div class="col s8 m12">
             <h1>Keep it simple, your information in one click</h1>
             <h2>Get all the files wherever you are</h2>
-            <a href="{{ url('/register') }}" class="btn">Register</a>
+            <a href="{{ route('register') }}" class="btn" id="register-button">Register</a>
         </div>
-        
+
     </div>
 </div>
 
@@ -54,7 +54,7 @@
     <!--     </div> -->
     <!-- </section> -->
 
-    
+
     <section id="save">
         <div class="col-sm-12 col-md-4 col-md-push-6">
             <h2>Save your files with a different point of view</h2>
@@ -62,4 +62,4 @@
     </section>
 </div>
 
-@endsection 
+@endsection
