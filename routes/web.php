@@ -18,6 +18,7 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/shared', 'HomeController@sharedWith')->name('home');
 
 Route::group(['prefix' => 'file'], function () {
   
@@ -36,5 +37,12 @@ Route::group(['prefix' => 'file'], function () {
 
 	Route::delete('{file_id}', 'FileController@delete')->name('file.delete');
 	Route::delete('{file_id}/permanent', 'FileController@deleteHard')->name('file.delete.hard');
-	Route::delete('{file_id}/version/{id_version}', 'FileController@deleteVersion')->name('file.version.delete');;
+	Route::delete('{file_id}/version/{id_version}', 'FileController@deleteVersion')->name('file.version.delete');
+
+	Route::group(['prefix' => '{file_id}/share'], function (){
+
+		Route::get('/', 'FileController@sharedWith');
+	
+	});
+
 });

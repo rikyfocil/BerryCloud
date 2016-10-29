@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 // $checked = $request->has('newsletter') ? true: false;
 
@@ -406,5 +407,63 @@ class FileController extends Controller{
 		return redirect()->route('file.show', [$file->id])
 			->with('success', 'The version is gone');
 	}
+
+	/* ==== Sharing permission === */
+
+	// Get the people that the file is shared with
+	function sharedWith($file_id){
+		$file = \App\File::where('id', $file_id)->firstOrFail();
+
+		if(!$this->ensureUserOwnerPermission($file))
+			abort(403);
+
+		$query =  DB::table('shares')->join('permission_types', 'shares.idPermissionType', 'permission_types.id')->join('users', 'shares.idUser', 'users.id')->select('users.email', 'permission_types.name', 'shares.dueDate', 'shares.idPermissionType as share_type')->where('shares.idFile', $file_id)->get();
+
+		return $query;
+	}
+
+	// Share the file
+	function shareWith($file_id){
+		$file = \App\File::where('id', $file_id)->firstOrFail();
+
+		if(!$this->ensureUserOwnerPermission($file))
+			abort(403);
+
+		$this->validate($request, [
+    	    'user' => 'required|exists:users',
+    	   	'permissionType' => 'required|numeric|exists:permission_types'
+	    ]);
+
+		$share = Share::where('idUser', Auth::user()->id)->where('idFile', $file_id)->firstOrNew();
+		$share->update([$request]);
+		
+		if(!$share->save()){
+			Log::creitical('Could not save share');
+			abort(500);
+		}
+
+		return 'success';
+	}
+
+	// Delete sharing
+	// Share the file
+	function deleteShare($share_id){
+
+		$share = Share::where('id', $share_id)->firstOrFail(); 
+		$file = $share->file()->firstOrFail();
+
+		if(!$this->ensureUserOwnerPermission($file))
+			abort(403);
+
+		
+		if(!$share->delete()){
+			Log::creitical('Could not delete share');
+			abort(500);
+		}
+
+		return 'success';
+	}
+
+
 
 }
