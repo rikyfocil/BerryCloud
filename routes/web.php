@@ -18,6 +18,8 @@ Route::get('/', function () {
 Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/shared', 'HomeController@sharedWith')->name('home');
 
+Route::get('/users_complete', 'UsersController@usersLike');
+
 Route::group(['prefix' => 'file'], function () {
 
 	Route::get('upload', 'FileController@uploadForm')->name('uploadGet');
@@ -33,6 +35,9 @@ Route::group(['prefix' => 'file'], function () {
 	Route::post('{file_id}/version', 'FileController@uploadVersion')->name('uploadVersion');
 	Route::post('{file_id}/version/{id_version}/restore', 'FileController@restoreVersion')->name('file.version.restore');
 
+	Route::post('{file_id}/makePublic', 'FileController@makePublic')->name('file.publish');
+	Route::post('{file_id}/makePrivate', 'FileController@makePrivate')->name('file.unpublish');
+
 	Route::delete('{file_id}', 'FileController@delete')->name('file.delete');
 	Route::delete('{file_id}/permanent', 'FileController@deleteHard')->name('file.delete.hard');
 	Route::delete('{file_id}/version/{id_version}', 'FileController@deleteVersion')->name('file.version.delete');
@@ -40,7 +45,8 @@ Route::group(['prefix' => 'file'], function () {
 	Route::group(['prefix' => '{file_id}/share'], function (){
 
 		Route::get('/', 'FileController@sharedWith');
-	
+		Route::post('/', 'FileController@shareWith')->name('file.share.create');
+		Route::delete('/{id}', 'FileController@deleteShare')->name('file.share.delete');
 	});
 
 });

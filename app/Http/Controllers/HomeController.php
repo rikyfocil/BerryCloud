@@ -31,6 +31,7 @@ class HomeController extends Controller
         return view('home', ['files' => $userFiles]);
     }
 
+    // The files passed here also recieve the owner parsed
     public function sharedWith()
     {
 

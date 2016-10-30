@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Version;
+use App\PermissionType;
 use App\Share;
+use App\User;
 use Carbon\Carbon;
 
 use Illuminate\Support\Facades\Auth;
@@ -154,8 +156,14 @@ class FileController extends Controller{
 		$versions = Version::where('idFile', $file->id)
 			->orderBy('updated_at', 'desc')->get();
 
+		$sharing_types = [];
 
-		return view('file.show', ['file' => $file, 'versions' => $versions]);
+		$shareTable = PermissionType::all(); 
+		foreach ($shareTable as $share) {
+			$sharing_types[$share->id] = $share->name;
+		}
+
+		return view('file.show', ['file' => $file, 'versions' => $versions, 'sharing_types' => $sharing_types]);
 	}
 
 	function upload(Request $request){
@@ -417,39 +425,51 @@ class FileController extends Controller{
 		if(!$this->ensureUserOwnerPermission($file))
 			abort(403);
 
-		$query =  DB::table('shares')->join('permission_types', 'shares.idPermissionType', 'permission_types.id')->join('users', 'shares.idUser', 'users.id')->select('users.email', 'permission_types.name', 'shares.dueDate', 'shares.idPermissionType as share_type')->where('shares.idFile', $file_id)->get();
+		$shares =  DB::table('shares')->join('permission_types', 'shares.idPermissionType', 'permission_types.id')->join('users', 'shares.idUser', 'users.id')->select('shares.id', 'users.email', 'permission_types.name', 'shares.dueDate', 'shares.idPermissionType as share_type')->where('shares.idFile', $file_id)->get();
 
-		return $query;
+		return $shares;
 	}
 
 	// Share the file
-	function shareWith($file_id){
+	function shareWith(Request $request, $file_id){
 		$file = \App\File::where('id', $file_id)->firstOrFail();
 
 		if(!$this->ensureUserOwnerPermission($file))
 			abort(403);
 
 		$this->validate($request, [
-    	    'user' => 'required|exists:users',
-    	   	'permissionType' => 'required|numeric|exists:permission_types'
+    	    'user' => 'required|exists:users,email',
+    	   	'idPermissionType' => 'required|numeric|exists:permission_types,id',
+    	   	'dueDate' => 'date'
 	    ]);
 
-		$share = Share::where('idUser', Auth::user()->id)->where('idFile', $file_id)->firstOrNew();
-		$share->update([$request]);
+		$user = User::where('email', $request->user)->firstOrFail();
+		
+		$share = Share::firstOrNew(['idUser' => $user->id , 'idFile' => $file_id]);
+		
+		if($request->has('dueDate'))
+			$share->dueDate = $request->dueDate;
+
+		$share->idPermissionType = $request->idPermissionType;
 		
 		if(!$share->save()){
-			Log::creitical('Could not save share');
+			Log::critical('Could not save share');
 			abort(500);
 		}
 
-		return 'success';
+		return ['id' => $share->id, 'email' => $user->email, 'name' => $share->permissionType()->first()->name, 'dueDate' => $share->dueDate, 'share_type' => $share->idPermissionType];
 	}
 
 	// Delete sharing
 	// Share the file
-	function deleteShare($share_id){
+	function deleteShare($file_id, $share_id){
 
 		$share = Share::where('id', $share_id)->firstOrFail(); 
+
+		if($share->idFile != $file_id){
+			abort(404);
+		}
+
 		$file = $share->file()->firstOrFail();
 
 		if(!$this->ensureUserOwnerPermission($file))
@@ -457,13 +477,55 @@ class FileController extends Controller{
 
 		
 		if(!$share->delete()){
-			Log::creitical('Could not delete share');
+			Log::critical('Could not delete share');
 			abort(500);
 		}
 
-		return 'success';
+		return ['message' => 'success', 'id' => $share->id];
 	}
 
+	// The last section on the sharing engine is about making the file public and making it private again
 
+	function makePublic($file_id){
+
+		$file = \App\File::where('id', $file_id)->firstOrFail();
+
+		if(!$this->ensureUserOwnerPermission($file)){
+			abort(403);
+		}
+
+		if($file->publicRead){
+			// The file was already public so the user should not be here
+			Log::info('Attempted to make public an already public file');
+			abort(404);
+		}
+
+		$file->publicRead = true;
+		$file->save();
+
+		return redirect()->route('file.show', [$file->id])
+			->with('success', 'The file is open to the entire world now!');
+	}
+
+	function makePrivate($file_id){
+
+		$file = \App\File::where('id', $file_id)->firstOrFail();
+
+		if(!$this->ensureUserOwnerPermission($file)){
+			abort(403);
+		}
+
+		if(!$file->publicRead){
+			// The file was already private so the user should not be here
+			Log::info('Attempted to make private an already private file');
+			abort(404);
+		}
+
+		$file->publicRead = false;
+		$file->save();
+
+		return redirect()->route('file.show', [$file->id])
+			->with('success', 'The file is protected again!');
+	}
 
 }
