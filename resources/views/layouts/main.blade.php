@@ -4,9 +4,12 @@
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400" rel="stylesheet">
+    @yield('css')
     <link href="{{ elixir('css/style.css') }}" rel="stylesheet">
     <meta charset="UTF-8">
-    <title>@yield('title')</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@yield('title', 'BerryCloud')</title>
 </head>
 <body>
 
@@ -39,28 +42,17 @@
     @if(Auth::check())
         <div class = "collapse navbar-collapse" id = "example-navbar-collapse">
             <ul class = "nav navbar-nav navbar-right">
-                <li class = "dropdown">
-                    <a href = "#" class = "dropdown-toggle" data-toggle = "dropdown">
-                    User
-                    <b class = "caret"></b>
+                <li><a href = "{{route('home')}}">Home</a></li>
+                <li>
+                    <a href="{{ route('logout') }}"
+                                onclick="event.preventDefault();
+                                document.getElementById('logout-form').submit();">
+                            Logout
                     </a>
-
-                    <ul class = "dropdown-menu dropdown-menu-right">
-                    <li><a href = "{{route('home')}}">Home</a></li>
-                    <li>
-                        <a href="{{ route('logout') }}"
-                                    onclick="event.preventDefault();
-                                    document.getElementById('logout-form').submit();">
-                                Logout
-                        </a>
-                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                {{ csrf_field() }}
-                        </form>
-                    </li>
-                    </ul>
-
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                            {{ csrf_field() }}
+                    </form>
                 </li>
-
             </ul>
         </div>
     @else
@@ -86,5 +78,7 @@
     <script src="http://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    @yield('js')
 </body>
 </html>
