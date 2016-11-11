@@ -21,20 +21,20 @@ use Illuminate\Support\Facades\DB;
 
 class FileController extends Controller{
 
-	  /*
+	  /*     
 	  This method is provided to make sure that the user has a folder before
 	  performing operations on it. This method should always return true and
 	  in case it doesn't, it means that the user is a guest or that there was
-	  a critical error.
+	  a critical error. 
 	  The caller should act accordingly
 	  */
  	private function ensureUserFolder() {
-
+  
 	  	if(Auth::check()){
 
 	  		$id = Auth::user()->id;
 				$exists = Storage::disk('local')->exists($id);
-
+			
 				if(!$exists){
 
 					if(!Storage::disk('local')->makeDirectory($id)){
@@ -52,7 +52,7 @@ class FileController extends Controller{
 					return false;
 				}
 
-				return true;
+				return true;	
 		  } // Auth::check
 
 		  Log::info('upload rejected as the user is not authenticaded');
@@ -60,7 +60,7 @@ class FileController extends Controller{
 	}
 
 	private function ensureUserReadPermission(\App\File $file) {
-
+	  	
 	  	if($file->publicRead)
 	  		return true;
 
@@ -69,12 +69,12 @@ class FileController extends Controller{
 
 	  	if(Auth::check()){
 	  		$id = Auth::user()->id;
-
+  
 	  		// We search for not expired shares
 	  		if(Share::where('idFile', $file->id)->where('idUser', $id)
 	  			->where('dueDate', '>', Carbon::now())->exists())
 	  				return true;
-
+	  		
 	  		// Last we check for not expiring shares
 	  		if(Share::where('idFile', $file->id)->where('idUser', $id)
 	  			->where('dueDate', null)->exists())
@@ -88,7 +88,7 @@ class FileController extends Controller{
 	private function ensureUserWritePermission(\App\File $file) {
 
 		if($this->ensureUserOwnerPermission($file))
-	  		return true;
+	  		return true;  	
 
 	  	if(!Auth::check() || !$this->ensureUserReadPermission($file))
 	  		return false;
@@ -101,10 +101,10 @@ class FileController extends Controller{
 		// We search for not expired shares
 		if( $share != null && $share->hasWritePermission() )
 				return true;
-
+		  	
 	  	$share = Share::where('idFile', $file->id)->where('idUser', $id)
 	  			->where('dueDate', null)->first();
-
+	  	
 	  	// Last we check for not expiring shares
 	  	if($share != null && $share->hasWritePermission())
 	  		return true;
@@ -113,12 +113,12 @@ class FileController extends Controller{
 	}
 
 	private function ensureUserOwnerPermission(\App\File $file) {
-
+  	
   		if(!Auth::check())
   			return false;
 
  		$id = Auth::user()->id;
-
+  		
 		// If the user is the owner then he has full access
 		if($file->owner == $id)
 		  return true;
@@ -132,7 +132,7 @@ class FileController extends Controller{
 		$exists = Storage::disk('local')->exists($path);
 
 		if(!$exists){
-			Log::critical('The version requested is not present on the disk but is on
+			Log::critical('The version requested is not present on the disk but is on 
 				the db. path:' . $path);
 			abort(500);
 		}
@@ -158,7 +158,7 @@ class FileController extends Controller{
 
 		$sharing_types = [];
 
-		$shareTable = PermissionType::all();
+		$shareTable = PermissionType::all(); 
 		foreach ($shareTable as $share) {
 			$sharing_types[$share->id] = $share->name;
 		}
@@ -186,7 +186,7 @@ class FileController extends Controller{
 		$userID = Auth::user()->id;
 
 		// We remove the extension where we save the file
-		$path = $file->storeAs( $userID,
+		$path = $file->storeAs( $userID, 
 			preg_replace('/\\.[^.\\s]{1,5}$/', '', $file->hashName()) );
 
 		$name = $file->getClientOriginalName();
@@ -219,7 +219,7 @@ class FileController extends Controller{
 		$version = new Version;
 		$version->idFile = $fileModel->id;
 		$version->path = $path;
-
+		
 		if(!$version->save()){
 			Log::critical('Could not save version.');
 			abort(500);
@@ -244,7 +244,7 @@ class FileController extends Controller{
 			abort(500);
 		}
 
-		return $this->responseDownload($version);
+		return $this->responseDownload($version);	
 	}
 
 	function downloadVersion(Request $request, $file_id, $version_id){
@@ -261,7 +261,7 @@ class FileController extends Controller{
 		if(!$this->ensureUserReadPermission($file))
 			abort(403);
 
-		return $this->responseDownload($version);
+		return $this->responseDownload($version);	
 	}
 
 	function uploadVersion(Request $request, $file_id){
@@ -279,7 +279,7 @@ class FileController extends Controller{
 		}
 
 		// Even if we validated on the get request we can't ensure that the
-		// user played fair and didn´t change the id. We must validate.
+		// user played fair and didn´t change the id. We must validate. 
 		$fileModel = \App\File::where('id', $file_id)->firstOrFail();
 
 		if(!$this->ensureUserWritePermission($fileModel))
@@ -287,13 +287,13 @@ class FileController extends Controller{
 
 		// We remove the extension where we save the file
 
-		$path = $uploadedFile->storeAs( $fileModel->owner,
+		$path = $uploadedFile->storeAs( $fileModel->owner, 
 			preg_replace('/\\.[^.\\s]{1,5}$/', '', $uploadedFile->hashName()));
 
 		$version = new Version;
 		$version->idFile = $fileModel->id;
 		$version->path = $path;
-
+		
 		if(!$version->save()){
 			Log::critical('Could not save version.');
 			abort(500);
@@ -304,7 +304,7 @@ class FileController extends Controller{
 	}
 
 	function uploadVersionGet(Request $request, $file_id){
-
+		
 		$file = \App\File::where('id', $file_id)->firstOrFail();
 
 		if(!$this->ensureUserWritePermission($file))
@@ -314,8 +314,8 @@ class FileController extends Controller{
 	}
 
 	function restoreVersion(Request $request, $file_id, $version_id){
-
-		/*
+		
+		/* 
 		Restoring a version is an easy process. The only thing that needs to be
 		done is changing the updated_at field of the version to match the moment
 		when the user request it to become the main version. This way we don't lose
@@ -324,7 +324,7 @@ class FileController extends Controller{
 
 		$file = \App\File::where('id', $file_id)->firstOrFail();
 		$version = Version::where('id', $version_id)->firstOrFail();
-
+		
 		// We cross check file and version
 		if( $file->id != $version->file()->first()->id )
 			abort(404);
@@ -339,15 +339,15 @@ class FileController extends Controller{
 	}
 
 	function restoreFile(Request $request, $file_id){
-
-		/*
+		
+		/* 
 		Restoring a file means that we will remove the deleted_at field from it.
-		Laravel can manage this process for us, but we take care that we only
+		Laravel can manage this process for us, but we take care that we only 
 		restore a trashed file in the query.
 		*/
 
 		$file = \App\File::onlyTrashed()->where('id', $file_id)->firstOrFail();
-
+		
 		if(!$this->ensureUserWritePermission($file))
 			abort(403);
 
@@ -359,7 +359,7 @@ class FileController extends Controller{
 	function delete(Request $request, $file_id){
 
 		$file = \App\File::where('id', $file_id)->firstOrFail();
-
+		
 		if(!$this->ensureUserWritePermission($file))
 			abort(403);
 
@@ -367,7 +367,7 @@ class FileController extends Controller{
 
 		return redirect()->route('home')->with('success', 'File moved to trash');
 	}
-
+	
 	function deleteHard(Request $request, $file_id){
 		/*
 			This is a method where the user can opt for destroying his file for good.
@@ -444,14 +444,14 @@ class FileController extends Controller{
 	    ]);
 
 		$user = User::where('email', $request->user)->firstOrFail();
-
+		
 		$share = Share::firstOrNew(['idUser' => $user->id , 'idFile' => $file_id]);
-
+		
 		if($request->has('dueDate'))
 			$share->dueDate = $request->dueDate;
 
 		$share->idPermissionType = $request->idPermissionType;
-
+		
 		if(!$share->save()){
 			Log::critical('Could not save share');
 			abort(500);
@@ -464,7 +464,7 @@ class FileController extends Controller{
 	// Share the file
 	function deleteShare($file_id, $share_id){
 
-		$share = Share::where('id', $share_id)->firstOrFail();
+		$share = Share::where('id', $share_id)->firstOrFail(); 
 
 		if($share->idFile != $file_id){
 			abort(404);
@@ -475,7 +475,7 @@ class FileController extends Controller{
 		if(!$this->ensureUserOwnerPermission($file))
 			abort(403);
 
-
+		
 		if(!$share->delete()){
 			Log::critical('Could not delete share');
 			abort(500);
