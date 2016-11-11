@@ -1,8 +1,8 @@
 @extends('layouts.main')
 
-@section('css')
+@push('css')
     <link href="{{ elixir('css/basic.css') }}" rel="stylesheet">
-@endsection
+@endpush
 
 @section('content')
 
@@ -65,36 +65,36 @@
 
 @endsection
 
-
-@section ('js')
-    <script type="text/javascript" src="{{ elixir('js/dropzone.js') }}"></script>
-    <script type="text/javascript">
+@push('scripts')
+    <script src="{{ asset('/js/dropzone.js') }}"></script>
+    <script>
         Dropzone.options.myDropzone= {
-        url: '{{ route('upload')}}',
-        autoProcessQueue: false,
-        uploadMultiple: false,
-        maxFiles: 1,
-        addRemoveLinks: true,
-        dictResponseError: "Error while uploading the file",
-        init: function() {
-            dzClosure = this; // Makes sure that 'this' is understood inside the functions below.
+            url: '{{ route('upload')}}',
+            autoProcessQueue: false,
+            uploadMultiple: false,
+            maxFiles: 1,
+            addRemoveLinks: true,
+            createImageThumbnails: false,
+            dictResponseError: "Error while uploading the file",
+            init: function() {
+                dzClosure = this; // Makes sure that 'this' is understood inside the functions below.
 
-            // for Dropzone to process the queue (instead of default form behavior):
-            document.getElementById("submit-all").addEventListener("click", function(e) {
-                // Make sure that the form isn't actually being sent.
-                e.preventDefault();
-                e.stopPropagation();
-                dzClosure.processQueue();
-            });
+                // for Dropzone to process the queue (instead of default form behavior):
+                document.getElementById("submit-all").addEventListener("click", function(e) {
+                    // Make sure that the form isn't actually being sent.
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dzClosure.processQueue();
+                });
 
-            this.on("complete", function(file) {
-				location.reload(true);
-                this.removeAllFiles();
-            });
-			this.on("sending", function (file, xhr, formData) {
-                formData.append("_token", "{{ csrf_token() }}");
-			});
+                this.on("complete", function(file) {
+                    location.reload(true);
+                    this.removeAllFiles();
+                });
+                this.on("sending", function (file, xhr, formData) {
+                    formData.append("_token", "{{ csrf_token() }}");
+                });
+            }
         }
-    }
-</script>
-@endsection
+    </script>
+@endpush
