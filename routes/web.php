@@ -16,7 +16,7 @@ Route::get('/', function () {
 })->name('/');
 
 Route::get('/home', 'HomeController@index')->name('home');
-Route::get('/shared', 'HomeController@sharedWith')->name('home');
+Route::get('/shared', 'HomeController@sharedWith')->name('shared');
 
 Route::get('/users_complete', 'UsersController@usersLike');
 
@@ -48,6 +48,13 @@ Route::group(['prefix' => 'file'], function () {
 		Route::post('/', 'FileController@shareWith')->name('file.share.create');
 		Route::delete('/{id}', 'FileController@deleteShare')->name('file.share.delete');
 	});
+
+});
+
+
+Route::group(['prefix' => 'folder'], function () {
+
+	Route::post('create', 'FileController@createFolder')->name('folder.create');
 
 });
 

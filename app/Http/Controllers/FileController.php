@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 
 // $checked = $request->has('newsletter') ? true: false;
@@ -61,7 +62,22 @@ class FileController extends Controller{
 
 	private function ensureUserReadPermission(\App\File $file) {
 	  	
-	  	if($file->publicRead)
+	  	if($this->ensureUserReadPermissionToSingleFile($file)){
+	  		return true;
+	  	}
+
+	  	$parent = $file->parent()->first();
+	  	if($parent != null){
+	  		return $this->ensureUserReadPermission($parent);
+	  	}
+
+	  	return false;
+	  	
+ 	}
+
+	private function ensureUserReadPermissionToSingleFile(\App\File $file) {
+
+		if($file->publicRead)
 	  		return true;
 
 	  	if($this->ensureUserOwnerPermission($file))
@@ -69,7 +85,6 @@ class FileController extends Controller{
 
 	  	if(Auth::check()){
 	  		$id = Auth::user()->id;
-  
 	  		// We search for not expired shares
 	  		if(Share::where('idFile', $file->id)->where('idUser', $id)
 	  			->where('dueDate', '>', Carbon::now())->exists())
@@ -83,9 +98,25 @@ class FileController extends Controller{
 		} // Auth::check
 
   		return false;
- 	}
+	}
+
 
 	private function ensureUserWritePermission(\App\File $file) {
+
+		if($this->ensureUserWritePermissionToSingleFile($file)){
+	  		return true;
+	  	}
+
+	  	$parent = $file->parent()->first();
+	  	if($parent != null){
+	  		return $this->ensureUserWritePermissionToSingleFile($parent);
+	  	}
+
+	  	return false;
+		
+	}
+
+	private function ensureUserWritePermissionToSingleFile(\App\File $file){
 
 		if($this->ensureUserOwnerPermission($file))
 	  		return true;  	
@@ -99,17 +130,18 @@ class FileController extends Controller{
 			->where('idUser', $id)->where('dueDate', '>', Carbon::now())->first();
 
 		// We search for not expired shares
-		if( $share != null && $share->hasWritePermission() )
+		if( $share != null && $share->permissionType()->first()->hasWritePermission() )
 				return true;
 		  	
 	  	$share = Share::where('idFile', $file->id)->where('idUser', $id)
 	  			->where('dueDate', null)->first();
 	  	
 	  	// Last we check for not expiring shares
-	  	if($share != null && $share->hasWritePermission())
+	  	if($share != null && $share->permissionType()->first()->hasWritePermission())
 	  		return true;
 
 	  	return false;
+
 	}
 
 	private function ensureUserOwnerPermission(\App\File $file) {
@@ -142,8 +174,22 @@ class FileController extends Controller{
   	}
 
 	function uploadForm(Request $request){
+		$params = array();
 
-		return view('file.upload');
+		if($request->has('parent')){
+			
+			$file = \App\File::where('id', $request->parent)->firstOrFail();
+			
+			if(!$file->isFolder)
+				abort(400);
+
+			if(!$this->ensureUserWritePermission($file))
+				abort(403);
+
+			$params['parent'] =  $request->parent;
+		}
+
+		return view('file.upload', $params);
 	}
 
 	function show(Request $request, $fileId){
@@ -163,7 +209,15 @@ class FileController extends Controller{
 			$sharing_types[$share->id] = $share->name;
 		}
 
-		return view('file.show', ['file' => $file, 'versions' => $versions, 'sharing_types' => $sharing_types]);
+		$params = ['file' => $file, 'versions' => $versions, 'sharing_types' => $sharing_types];
+
+		if($file->isFolder){
+			$params['parent'] = $file;
+			$params['files'] = $file->childs()->get();
+			return view('home', $params);
+		}
+		else 
+			return view('file.show', $params);
 	}
 
 	function upload(Request $request){
@@ -173,6 +227,7 @@ class FileController extends Controller{
 
 		$this->validate($request, [
     	    'file' => 'required|file',
+    	    'parent' => 'numeric|exists:files,id'
 	    ]);
 
 		$file = $request->file('file');
@@ -183,7 +238,22 @@ class FileController extends Controller{
 			]);
 		}
 
+		$parent = null;
 		$userID = Auth::user()->id;
+
+		if($request->has('parent')){
+			
+			$parentFile = \App\File::find($request->parent);
+			if(!$parentFile->isFolder){
+				abort(400);
+			}
+
+			if(!$this->ensureUserWritePermission($parentFile))
+				abort(403);
+
+			$parent = $parentFile->id;
+			$userID = $parentFile->owner;
+		}
 
 		// We remove the extension where we save the file
 		$path = $file->storeAs( $userID, 
@@ -192,7 +262,7 @@ class FileController extends Controller{
 		$name = $file->getClientOriginalName();
 
 		$fileModel = \App\File::where('name', $name)->where('owner', $userID)
-			->first();
+			->where('parent', $parent)->first();
 
 		// If there is not a model available. Therefore we need to create one
 		if($fileModel == null){
@@ -200,7 +270,7 @@ class FileController extends Controller{
 			// There is a really special case where the user upload a deleted
 			// file. We fix it here
 			$del = \App\File::onlyTrashed()->where('name', $name)
-			->where('owner', $userID)->first();
+			->where('owner', $userID)->where('parent', $parent)->first();
 
 			if($del != null){
 				$del->forceDelete();
@@ -209,6 +279,7 @@ class FileController extends Controller{
 			$fileModel = new \App\File;
 			$fileModel->name = $name;
 			$fileModel->owner =  $userID;
+			$fileModel->parent = $parent;
 
 			if(!$fileModel->save()){
 				Log::critical('Could not save file model');
@@ -236,15 +307,21 @@ class FileController extends Controller{
 		if(!$this->ensureUserReadPermission($file))
 			abort(403);
 
-		$version = Version::where('idFile', $file->id)
-			->orderBy('updated_at', 'desc')->first();
-
-		if($version == null){
-			Log::critical('There is a file without versions');
-			abort(500);
+		if($file->isFolder){
+			abort(501); // TBD, should zip a folder somehow and download it
 		}
+		else{
+			$version = Version::where('idFile', $file->id)
+				->orderBy('updated_at', 'desc')->first();
 
-		return $this->responseDownload($version);	
+			if($version == null){
+				Log::critical('There is a file without versions');
+				abort(500);
+			}
+
+			return $this->responseDownload($version);
+		}	
+
 	}
 
 	function downloadVersion(Request $request, $file_id, $version_id){
@@ -285,6 +362,9 @@ class FileController extends Controller{
 		if(!$this->ensureUserWritePermission($fileModel))
 			abort(403);
 
+		if($fileModel->isFolder)
+			abort(400);
+
 		// We remove the extension where we save the file
 
 		$path = $uploadedFile->storeAs( $fileModel->owner, 
@@ -310,6 +390,10 @@ class FileController extends Controller{
 		if(!$this->ensureUserWritePermission($file))
 			abort(403);
 
+		if($file->isFolder){
+			abort(400);
+		}
+
 		return view('file.version.upload', ['file'=>$file]);
 	}
 
@@ -320,6 +404,8 @@ class FileController extends Controller{
 		done is changing the updated_at field of the version to match the moment
 		when the user request it to become the main version. This way we don't lose
 		any data. Not even when was the version created and the ones above it.
+
+		There is no need of validating folders as they don´t create versions
 		*/
 
 		$file = \App\File::where('id', $file_id)->firstOrFail();
@@ -344,6 +430,8 @@ class FileController extends Controller{
 		Restoring a file means that we will remove the deleted_at field from it.
 		Laravel can manage this process for us, but we take care that we only 
 		restore a trashed file in the query.
+
+		Folders can work the same way as they are just entries of a file without versions
 		*/
 
 		$file = \App\File::onlyTrashed()->where('id', $file_id)->firstOrFail();
@@ -360,7 +448,7 @@ class FileController extends Controller{
 
 		$file = \App\File::where('id', $file_id)->firstOrFail();
 		
-		if(!$this->ensureUserWritePermission($file))
+		if(!$this->ensureUserOwnerPermission($file))
 			abort(403);
 
 		$file->delete();
@@ -528,4 +616,61 @@ class FileController extends Controller{
 			->with('success', 'The file is protected again!');
 	}
 
+
+	/*========================= Folder engine ============================= */
+
+	function createFolder(Request $request){
+
+		$validator = Validator::make($request->all(), [
+    	    'name' => 'required|alpha_num',
+    	    'parent' => 'numeric|exists:files,id'
+	    ]);
+
+        if ($validator->fails()) {
+            return ['message' => $validator->messages(), 'success' => false];
+        }
+
+		if(!Auth::check()){
+			abort(403);
+		}
+
+		$parent = null;
+		$owner = Auth::user()->id;
+
+
+		if($request->has('parent')){
+			$parentFile = \App\File::where('id', $request->parent)->firstOrFail();
+
+			if (!$parentFile->isFolder) {
+            	return ['message' => 'Bad request', 'success' => false];
+			}
+
+			if(!$this->ensureUserWritePermission($parentFile)){
+	            return ['message' => 'Forbidden', 'success' => false];
+			}
+
+			$owner = $parentFile->owner;
+			$parent = $parentFile->id;
+		}
+
+		$exists = \App\File::where(['name'=>$request->name, 'parent'=>$parent, 'owner'=>$owner])->count();
+
+		if($exists){
+			return ['message' => 'File or folder already exists by that name', 'success' => false];
+		}
+		
+		$folder = new \App\File();
+		$folder->isFolder = true;
+		$folder->name = $request->name;
+		$folder->owner = $owner;
+		$folder->parent = $parent;
+
+		$success = $folder->save();
+
+		if (!$success) {
+			Log::critical("Could not create folder. Please debug");
+		}
+
+		return ['message' => 'Ok', 'success' => $success];
+	}
 }

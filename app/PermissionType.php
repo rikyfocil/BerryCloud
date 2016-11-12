@@ -18,6 +18,6 @@ class PermissionType extends Model
     }
 
     public function hasWritePermission(){
-    	return $this->id <= $writePermissionID;
+    	return $this->id <= $this->writePermissionID;
     }
 }
