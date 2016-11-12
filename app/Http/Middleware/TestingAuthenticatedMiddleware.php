@@ -16,8 +16,8 @@ class TestingAuthenticatedMiddleware
      */
     public function handle($request, Closure $next)
     {
-        Auth::logout();
-        Auth::loginUsingId(3);
+        // Auth::logout();
+        // Auth::loginUsingId(3);
         return $next($request);
     }
 }
