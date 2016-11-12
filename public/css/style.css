@@ -5,7 +5,6 @@ body{
     background: #efefef;
 }
 
-
 h1,h2,h3,h4,h5,h6 {
     font-weight:300;
 }
@@ -32,10 +31,28 @@ h1,h2,h3,h4,h5,h6 {
 .container-fluid {
     padding: 0;
 }
+
+.dz-message {
+    padding-top: 5em;
+}
+
+.dropzone .dz-preview{
+    width: 80%;
+}
+
 .feats {
     height: 50vh;
     margin: 1.5em auto;
     padding-top: 2em;
+}
+
+
+.fileListForm > .btn-default {
+    border: none;
+}
+
+#file-navbar {
+    margin: 2em 0;
 }
 
 .glyph-welcome {
@@ -45,6 +62,15 @@ h1,h2,h3,h4,h5,h6 {
 }
 
 
+.mobileActionId{
+    padding: 0;
+}
+
+
+#mobileUploadForm {
+    background: rgba(255,255,255,0.2);
+    height: 50vh;
+}
 #welcome-jumbotron {
     background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('../img/action.jpeg');
     -webkit-background-size: cover;
@@ -54,6 +80,36 @@ h1,h2,h3,h4,h5,h6 {
     height: 100vh;
     color:#fff;
 }
+
+
+#new-file-button {
+    width: 100%;
+}
+#no-files {
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('../img/sky.jpeg'); 
+    background-position: 50% 50%;
+    -webkit-background-size: cover; 
+    -moz-background-size: cover; 
+    -o-background-size: cover; 
+    background-size: cover; 
+    color:#fff; 
+    min-height: 100vh; 
+    margin: 0;
+    overflow-y: hidden;
+    padding: 5em 2em;
+}
+
+#no-files h2 a {
+    color: #fff;
+    overflow-y: none;
+    text-decoration: underline;
+}
+
+#myDropzone {
+    height: 80%;
+    width: 100%;
+}
+
 
 .navbar {
     background-color:#fff;
@@ -71,6 +127,12 @@ h1,h2,h3,h4,h5,h6 {
     height: 3em;
     margin: -1em 0 0 2em;
 }
+
+#submit-all {
+    width: 100%;
+}
+
+
 #think {
     height:60vh;
     -webkit-background-size: 100%;
@@ -109,13 +171,30 @@ h1,h2,h3,h4,h5,h6 {
     padding-top: 8em;
 }
 
+th {
+    background: #fff;
+}
+
 #welcome_info {
     margin-top: 15%;
 }
 
-@media (min-width: @screen-sm-min) {
-    .navbar li:last-child {
-        border-left: 1px solid #778182;
+@media (min-width: 768px) {
+    #new-file-button{
+        width: 10%;
+    }
+    #no-files {
+        padding-top: 15em;
+    }
+}
+
+@media (min-width: 1024px){
+    .fileListForm {
+        display: inline-block;
+        float:left;
+    }
+    #file-navbar {
+        padding-left: 9.5%;
     }
 }
 

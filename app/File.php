@@ -57,4 +57,9 @@ class File extends Model {
 
         return $this->concludeForceDelete();
     }
+
+    public function currentVersion()
+    {
+        return $this->versions()->orderBy('updated_at','desc')->first();
+    }
 }
