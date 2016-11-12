@@ -72,6 +72,9 @@ class File extends Model {
 
     public function currentVersion()
     {
-        return $this->versions()->orderBy('updated_at','desc')->first();
+        if($this->isFolder)
+            return $this->updated_at;
+
+        return $this->versions()->orderBy('updated_at','desc')->first()->updated_at;
     }
 }
