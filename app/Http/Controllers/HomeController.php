@@ -28,6 +28,7 @@ class HomeController extends Controller
     public function index()
     {
         $userFiles = File::where('owner', Auth::user()->id)->where('parent', null)->get();
+
         return view('home', ['files' => $userFiles]);
     }
 

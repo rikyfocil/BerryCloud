@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+
 use Illuminate\Support\Facades\DB;
 
 // $checked = $request->has('newsletter') ? true: false;
@@ -218,6 +219,7 @@ class FileController extends Controller{
 		}
 		else 
 			return view('file.show', $params);
+
 	}
 
 	function upload(Request $request){
@@ -673,4 +675,5 @@ class FileController extends Controller{
 
 		return ['message' => 'Ok', 'success' => $success];
 	}
+
 }
