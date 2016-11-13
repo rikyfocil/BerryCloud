@@ -51,6 +51,13 @@ Route::group(['prefix' => 'file'], function () {
 
 });
 
+
+Route::group(['prefix' => 'folder'], function () {
+
+	Route::post('create', 'FileController@createFolder')->name('folder.create');
+
+});
+
 // Authentication Routes...
 Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
 Route::post('login', 'Auth\LoginController@login');

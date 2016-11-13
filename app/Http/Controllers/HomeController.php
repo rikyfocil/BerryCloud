@@ -27,7 +27,8 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $userFiles = File::where('owner', Auth::user()->id)->get();
+        $userFiles = File::where('owner', Auth::user()->id)->where('parent', null)->get();
+
         return view('home', ['files' => $userFiles]);
     }
 
@@ -35,16 +36,14 @@ class HomeController extends Controller
     public function sharedWith()
     {
 
-        $sharedWithMe = Share::where('idUser',1)->where( function($query){ 
-            $query->where('dueDate', null)->orWhere('dueDate', '<', Carbon::now() );
+        $sharedWithMe = Share::where('idUser', Auth::user()->id)->where( function($query){ 
+            $query->where('dueDate', null)->orWhere('dueDate', '>', Carbon::now() );
         } )->get();
 
         $fileArray = [];
 
         foreach ($sharedWithMe as $currentShare) {
             $file = $currentShare->file()->first();
-            $owner = $file->owner()->first();
-            $file->owner = $owner;
             array_push($fileArray, $file);
         }
 

@@ -14,39 +14,9 @@
         </button>
     </div>
     <div class="col-sm-12 col-md-10 col-md-offset-1">
-        <table class="table table-hover">
-            <tr>
-                <th>File name</th>
-                <th class="text-right hidden-xs">Last version modified</th>
-                <th class="text-right">Options</th>
-            </tr>
-        @foreach ($files as $file)
-            <tr>
-                <td><a href="{{route('file.show', $file->id)}}">{{$file->name}}</a></td>
-                <td class="text-right hidden-xs">
-                    {{ $file->currentVersion()->updated_at }}
-                </td>
-                <td>
-                <div class="btn-group visible-xs-* hidden-xs hidden-sm pull-right" role="group" aria-label="actionGroup">
-                    {!! Helper::createButtonWithIcon('GET', ['file.download',$file->id], "Download", "btn btn-default", "glyphicon-download-alt") !!}
-                    {!! Helper::createButtonWithIcon('DELETE', ['file.delete', $file->id], "Delete", "btn btn-default", "glyphicon-trash") !!}
-                </div>
-                <div class="dropdown pull-right hidden-md hidden-lg">
-                    <button class="btn btn-default dropdown-toggle" type="button" id="mobileActionId" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                        Actions
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-right mobileActionId" aria-labelledby="mobileActionId">
-                        <li>{!! Helper::createButton('GET', ['file.download',$file->id], "Download", "") !!}</li>
-                        <li>{!! Helper::createButton('DELETE', ['file.delete', $file->id], "Delete", "") !!}</li>
-                    </ul>
-                </div>
-                </td>
-            </tr>
-
-        @endforeach
-        </table>
+        @include('layouts.files')
     </div>
+
 
 @else
     <div class="jumbotron text-center" id="no-files">
@@ -93,6 +63,9 @@
                 });
                 this.on("sending", function (file, xhr, formData) {
                     formData.append("_token", "{{ csrf_token() }}");
+                    @if(isset($parent))
+                    formData.append("parent", {{$parent->id}});
+                    @endif
                 });
             }
         }

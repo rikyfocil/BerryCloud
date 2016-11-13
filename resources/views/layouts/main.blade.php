@@ -7,10 +7,14 @@
     @stack('css')
     <link href="{{ elixir('css/style.css') }}" rel="stylesheet">
     <link href="{{ asset('css/jquery-ui.css') }}" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ asset('fontawsome/css/font-awesome.min.css') }}">
+    
     <meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'BerryCloud')</title>
+
     <script type="text/javascript">
       var base_url = '{!! url("/") !!}';
     </script>
@@ -47,6 +51,7 @@
     @if(Auth::check())
         <div class = "collapse navbar-collapse" id = "example-navbar-collapse">
             <ul class = "nav navbar-nav navbar-right">
+
                 <li><a href = "{{route('home')}}">Home</a></li>
                 <li>
                     <a href="{{ route('logout') }}"

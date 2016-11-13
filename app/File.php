@@ -47,12 +47,24 @@ class File extends Model {
 
     public function forceDelete()
     {
-        $versions = $this->versions()->get();
 
-        // To delete dependendencies and ensure a clean file system we delete
-        // the versions before the file
-        foreach ($versions as $version) {
-            $version->delete();
+        if($this->isFolder){
+
+            $files = $this->childs()->get();
+
+            // We delete recursively
+            foreach ($files as $file) {
+                $file->forceDelete();
+            }
+        }
+        else{
+            $versions = $this->versions()->get();
+
+            // To delete dependendencies and ensure a clean file system we delete
+            // the versions before the file
+            foreach ($versions as $version) {
+                $version->delete();
+            }
         }
 
         return $this->concludeForceDelete();
@@ -60,6 +72,9 @@ class File extends Model {
 
     public function currentVersion()
     {
-        return $this->versions()->orderBy('updated_at','desc')->first();
+        if($this->isFolder)
+            return $this->updated_at;
+
+        return $this->versions()->orderBy('updated_at','desc')->first()->updated_at;
     }
 }
