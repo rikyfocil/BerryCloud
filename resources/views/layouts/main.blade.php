@@ -5,10 +5,10 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400" rel="stylesheet">
     @stack('css')
-    <link href="{{ elixir('css/style.css') }}" rel="stylesheet">
     <link href="{{ asset('css/jquery-ui.css') }}" rel="stylesheet">
-
     <link rel="stylesheet" href="{{ asset('fontawsome/css/font-awesome.min.css') }}">
+    <link href="{{ elixir('css/style.css') }}" rel="stylesheet">
+
     
     <meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">

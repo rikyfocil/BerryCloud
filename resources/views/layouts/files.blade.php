@@ -6,7 +6,7 @@
   </tr>
   @foreach ($files as $file)
       <tr>
-          <td><i class="fa {{ $file-> isFolder ? "fa-folder" : "fa-file" }}"></i> <a href="{{route('file.show', $file->id)}}">{{$file->name}}</a></td>
+          <td><i class="fa {{ $file-> isFolder ? "fa-folder" : "fa-file" }}" id="file-icon"></i> <a href="{{route('file.show', $file->id)}}">{{$file->name}}</a></td>
           <td class="text-right hidden-xs">
               {{ $file->currentVersion() }}
           </td>

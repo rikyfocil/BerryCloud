@@ -673,7 +673,14 @@ class FileController extends Controller{
 			Log::critical("Could not create folder. Please debug");
 		}
 
-		return ['message' => 'Ok', 'success' => $success];
+
+        if ($parent) {
+            return redirect()->route('file.show',$parent);
+        } else {
+            return redirect()->route('home');
+        }
+		// return redirect()->route('home');
+		// return ['message' => 'Ok', 'success' => $success];
 	}
 
 }
