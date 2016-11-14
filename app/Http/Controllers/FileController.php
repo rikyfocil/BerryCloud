@@ -674,7 +674,11 @@ class FileController extends Controller{
 		}
 
 
-        return redirect()->route('file.show',$parent);
+        if ($parent) {
+            return redirect()->route('file.show',$parent);
+        } else {
+            return redirect()->route('home');
+        }
 		// return redirect()->route('home');
 		// return ['message' => 'Ok', 'success' => $success];
 	}

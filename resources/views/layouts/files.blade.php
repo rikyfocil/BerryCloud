@@ -14,7 +14,6 @@
           <div class="btn-group visible-xs-* hidden-xs hidden-sm pull-right" role="group" aria-label="actionGroup">
               {!! Helper::createButtonWithIcon('GET', ['file.download',$file->id], "Download", "btn btn-default", "glyphicon-download-alt") !!}
               {!! Helper::createButtonWithIcon('DELETE', ['file.delete', $file->id], "Delete", "btn btn-default", "glyphicon-trash") !!}
-              {!! Helper::createButtonWithIcon('POST', ['file.delete', $file->id], "Delete", "btn btn-default", "glyphicon-trash") !!}
           </div>
           <div class="dropdown pull-right hidden-md hidden-lg">
               <button class="btn btn-default dropdown-toggle" type="button" id="mobileActionId" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
