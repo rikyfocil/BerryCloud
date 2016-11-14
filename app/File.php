@@ -77,4 +77,19 @@ class File extends Model {
 
         return $this->versions()->orderBy('updated_at','desc')->first()->updated_at;
     }
+
+    
+    public function hierarchy(){
+
+        $hierarchy = [$this];
+        $file = $this;
+
+        while($file->parent){
+            $file = $file->parent()->first();
+            array_unshift($hierarchy, $file);
+        }
+
+        return $hierarchy;
+    }
+
 }

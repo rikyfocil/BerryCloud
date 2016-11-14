@@ -6,7 +6,7 @@
   </tr>
   @foreach ($files as $file)
       <tr>
-          <td><i class="fa {{ $file-> isFolder ? "fa-folder" : "fa-file" }}"></i> <a href="{{route('file.show', $file->id)}}">{{$file->name}}</a></td>
+          <td><i class="fa {{ $file-> isFolder ? "fa-folder" : "fa-file" }}" id="file-icon"></i> <a href="{{route('file.show', $file->id)}}">{{$file->name}}</a></td>
           <td class="text-right hidden-xs">
               {{ $file->currentVersion() }}
           </td>
@@ -14,6 +14,7 @@
           <div class="btn-group visible-xs-* hidden-xs hidden-sm pull-right" role="group" aria-label="actionGroup">
               {!! Helper::createButtonWithIcon('GET', ['file.download',$file->id], "Download", "btn btn-default", "glyphicon-download-alt") !!}
               {!! Helper::createButtonWithIcon('DELETE', ['file.delete', $file->id], "Delete", "btn btn-default", "glyphicon-trash") !!}
+              {!! Helper::createButtonWithIcon('POST', ['file.delete', $file->id], "Delete", "btn btn-default", "glyphicon-trash") !!}
           </div>
           <div class="dropdown pull-right hidden-md hidden-lg">
               <button class="btn btn-default dropdown-toggle" type="button" id="mobileActionId" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">

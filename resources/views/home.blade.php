@@ -6,18 +6,14 @@
 
 @section('content')
 
+
+@include('includes.breadcrumb')
+
+
 @if (count($files) != 0)
-    <div class="col-sm-12 col-md-10 col-md-offset-1" id="file-navbar">
-        <!-- <a href="{{route('uploadGet')}}" class="btn btn&#45;success" id="new&#45;file&#45;button">Nuevo</a> -->
-        <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#modal-upload">
-            Nuevo
-        </button>
-    </div>
     <div class="col-sm-12 col-md-10 col-md-offset-1">
         @include('layouts.files')
     </div>
-
-
 @else
     <div class="jumbotron text-center" id="no-files">
         <h1>Your have no files yet.</h1>
@@ -31,7 +27,7 @@
 
 
 @include('includes.modal-upload')
-
+@include('includes.modal-folder')
 
 @endsection
 
