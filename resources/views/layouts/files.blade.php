@@ -21,10 +21,10 @@
                   <span class="caret"></span>
               </button>
               <ul class="dropdown-menu dropdown-menu-right mobileActionId" aria-labelledby="mobileActionId">
-                  <li>{!! Helper::createButton('GET', ['file.download',$file->id], "Download", "") !!}</li>
-                  @if(Auth::check() && Auth::user()->id == $file->owner)
-                   <li>{!! Helper::createButton('DELETE', ['file.delete', $file->id], "Delete", "") !!}</li>
-                  @endif
+                    <li>{!! Helper::createButton('GET', ['file.download',$file->id], "Download", "") !!}</li>
+                    @if(Auth::check() && Auth::user()->id == $file->owner)
+                        <li>{!! Helper::createButton('DELETE', ['file.delete', $file->id], "Delete", "") !!}</li>
+                    @endif
               </ul>
           </div>
           </td>

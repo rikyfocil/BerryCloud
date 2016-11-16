@@ -547,7 +547,8 @@ class FileController extends Controller{
 			abort(500);
 		}
 
-		return ['id' => $share->id, 'email' => $user->email, 'name' => $share->permissionType()->first()->name, 'dueDate' => $share->dueDate, 'share_type' => $share->idPermissionType];
+        return redirect()->route('file.show',$file_id);
+		// return ['id' => $share->id, 'email' => $user->email, 'name' => $share->permissionType()->first()->name, 'dueDate' => $share->dueDate, 'share_type' => $share->idPermissionType];
 	}
 
 	// Delete sharing

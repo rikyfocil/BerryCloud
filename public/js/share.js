@@ -110,11 +110,11 @@ function createHTMLRowForData(data){
 
 	var generatedHtml = '<tr data-id="' + data.id + '">';
 	generatedHtml += "<td>" + data.email + "</td>";
-	generatedHtml += "<td>" + data.name + "</td>";
+	generatedHtml += "<td class='text-right hidden-xs'>" + data.name + "</td>";
 
 	var text = data.dueDate == null ? "Never" : data.dueDate;
-	generatedHtml += "<td>" + text + "</td>";
-	generatedHtml += '<td class="share-options-td"><button type="button" class="btn btn-danger btn-delete">Delete entry</button></td>';
+	generatedHtml += "<td class='text-right hidden-xs'>" + text + "</td>";
+	generatedHtml += '<td class="share-options-td text-right"><button type="button" class="btn btn-danger btn-delete">Delete entry</button></td>';
 	generatedHtml += "</tr>"
 	$("#shareTableBody").append(generatedHtml);
 
