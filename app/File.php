@@ -5,7 +5,8 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 class File extends Model {     
 
     use SoftDeletes{
@@ -99,6 +100,97 @@ class File extends Model {
     }
 
     public function ensureUserWritePermission(User $user) {
-        return true;
+
+        if($this->isOwner())
+            return true;
+
+        if($this->ensureUserWritePermissionToSingleUser($user))
+            return true;
+
+        $groups = $user->groupMemberships()->get();
+        Log::warning(json_encode($groups));
+        foreach ($groups as $memebrship) {
+            if($this->ensureUserWritePermissionToSingleUser($memebrship->group()->first()->representativeUser()->first()))
+                return true;
+        }
+
+        return false;
+    }
+
+    private function ensureUserWritePermissionToSingleUser(User $user){
+
+        $id = $user->id;
+
+        $share = Share::where('idFile', $this->id)
+            ->where('idUser', $id)->where('dueDate', '>', Carbon::now())->first();
+
+        // We search for not expired shares
+        if( $share != null && $share->permissionType()->first()->hasWritePermission() )
+                return true;
+            
+        $share = Share::where('idFile', $this->id)->where('idUser', $id)
+                ->where('dueDate', null)->first();
+        
+        // Last we check for not expiring shares
+        if($share != null && $share->permissionType()->first()->hasWritePermission())
+            return true;
+
+        $parent = $this->parent()->first();
+
+        if(!$parent)
+            return false;
+
+        return $parent->ensureUserWritePermissionToSingleUser($user);
+    }
+
+    public function ensureUserReadPermission(User $user){
+        if($this->isOwner())
+            return true;
+
+        if($this->ensureUserReadPermissionToSingleUser($user))
+            return true;
+
+        $groups = $user->groupMemberships()->get();
+        Log::warning(json_encode($groups));
+        foreach ($groups as $memebrship) {
+            if($this->ensureUserReadPermissionToSingleUser($memebrship->group()->first()->representativeUser()->first()))
+                return true;
+        }
+
+        return false;
+    }
+
+    private function ensureUserReadPermissionToSingleUser(User $user){
+        
+         if($this->publicRead)
+            return true;
+
+        if(!$user){
+
+            $parent = $this->parent()->first();
+
+            if($parent)
+                return $parent->ensureUserReadPermissionToSingleUser($user);
+            
+            return false;
+        }
+
+        $id = $user->id;
+        // We search for not expired shares
+        if(Share::where('idFile', $this->id)->where('idUser', $id)
+            ->where('dueDate', '>', Carbon::now())->exists())
+                return true;
+        
+        // Last we check for not expiring shares
+        if(Share::where('idFile', $this->id)->where('idUser', $id)
+            ->where('dueDate', null)->exists())
+                return true; 
+
+        $parent = $this->parent()->first();
+
+        if($parent)
+            return $parent->ensureUserReadPermissionToSingleUser($user);
+        
+        return false;        
     }
 }

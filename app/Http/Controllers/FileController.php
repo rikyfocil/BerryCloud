@@ -63,87 +63,17 @@ class FileController extends Controller{
 
 	private function ensureUserReadPermission(\App\File $file) {
 	  	
-	  	if($this->ensureUserReadPermissionToSingleFile($file)){
-	  		return true;
-	  	}
-
-	  	$parent = $file->parent()->first();
-	  	if($parent != null){
-	  		return $this->ensureUserReadPermission($parent);
-	  	}
-
-	  	return false;
-	  	
+		return $file->ensureUserReadPermission(Auth::user());
  	}
 
-	private function ensureUserReadPermissionToSingleFile(\App\File $file) {
-
-		if($file->publicRead)
-	  		return true;
-
-	  	if($this->ensureUserOwnerPermission($file))
-	  		return true;
-
-	  	if(Auth::check()){
-	  		$id = Auth::user()->id;
-	  		// We search for not expired shares
-	  		if(Share::where('idFile', $file->id)->where('idUser', $id)
-	  			->where('dueDate', '>', Carbon::now())->exists())
-	  				return true;
-	  		
-	  		// Last we check for not expiring shares
-	  		if(Share::where('idFile', $file->id)->where('idUser', $id)
-	  			->where('dueDate', null)->exists())
-	  				return true;
-
-		} // Auth::check
-
-  		return false;
-	}
-
-
 	private function ensureUserWritePermission(\App\File $file) {
-
-		if($this->ensureUserWritePermissionToSingleFile($file)){
-	  		return true;
-	  	}
-
-	  	$parent = $file->parent()->first();
-	  	if($parent != null){
-	  		return $this->ensureUserWritePermissionToSingleFile($parent);
-	  	}
-
-	  	return false;
 		
+		if(!Auth::check())
+			return false;
+		
+		return $file->ensureUserWritePermission(Auth::user());
 	}
 
-	private function ensureUserWritePermissionToSingleFile(\App\File $file){
-
-		if($this->ensureUserOwnerPermission($file))
-	  		return true;  	
-
-	  	if(!Auth::check() || !$this->ensureUserReadPermission($file))
-	  		return false;
-
-		$id = Auth::user()->id;
-
-		$share = Share::where('idFile', $file->id)
-			->where('idUser', $id)->where('dueDate', '>', Carbon::now())->first();
-
-		// We search for not expired shares
-		if( $share != null && $share->permissionType()->first()->hasWritePermission() )
-				return true;
-		  	
-	  	$share = Share::where('idFile', $file->id)->where('idUser', $id)
-	  			->where('dueDate', null)->first();
-	  	
-	  	// Last we check for not expiring shares
-	  	if($share != null && $share->permissionType()->first()->hasWritePermission())
-	  		return true;
-
-	  	return false;
-
-	}
 
 	private function ensureUserOwnerPermission(\App\File $file) {
   	
