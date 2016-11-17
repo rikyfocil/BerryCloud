@@ -34,4 +34,12 @@ class User extends Authenticatable
     public function sharedFiles(){
         return $this->hasMany('App\Share', 'idUser');
     }
+
+    public function groupMemberships(){
+        return $this->hasMany('App\Member', 'idMember');
+    }
+
+    public function ownedGroups(){
+        return $this->hasMany('App\Group', 'idOwner');
+    }
 }

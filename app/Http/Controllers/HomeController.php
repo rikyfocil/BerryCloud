@@ -44,7 +44,9 @@ class HomeController extends Controller
 
         foreach ($sharedWithMe as $currentShare) {
             $file = $currentShare->file()->first();
-            array_push($fileArray, $file);
+
+            if(!$file->trashed())
+                array_push($fileArray, $file);
         }
 
         return view('home', ['files' => $fileArray]);

@@ -3,7 +3,7 @@
         <div class="modal-content">
             <form action="{{ route('file.share.create', $file->id) }}" enctype="multipart/form-data" method="POST">
                 <div class="form-group form-name">
-                    <label for="user">Share with (Email):</label>
+                    <label for="user">Share with (Email or group name):</label>
                     <input type="email" name="user" id="share-email" class="col-xs-12 form-control">
                 </div>
                 <div class="form-group form-name">

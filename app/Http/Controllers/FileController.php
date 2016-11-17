@@ -515,7 +515,16 @@ class FileController extends Controller{
 		if(!$this->ensureUserOwnerPermission($file))
 			abort(403);
 
-		$shares =  DB::table('shares')->join('permission_types', 'shares.idPermissionType', 'permission_types.id')->join('users', 'shares.idUser', 'users.id')->select('shares.id', 'users.email', 'permission_types.name', 'shares.dueDate', 'shares.idPermissionType as share_type')->where('shares.idFile', $file_id)->get();
+		$shares =  DB::table('shares')->join('permission_types', 'shares.idPermissionType', 'permission_types.id')->join('users', 'shares.idUser', 'users.id')->select('shares.id', 'users.email', 'users.name as uname', 'permission_types.name', 'shares.dueDate', 'shares.idPermissionType as share_type', 'users.isVirtual')->where('shares.idFile', $file_id)->get();
+
+		foreach ($shares as $share) {
+
+			if($share->isVirtual)
+				$share->email = $share->uname;
+			
+			$share->uname = null;
+		}
+
 
 		return $shares;
 	}
@@ -528,13 +537,17 @@ class FileController extends Controller{
 			abort(403);
 
 		$this->validate($request, [
-    	    'user' => 'required|exists:users,email',
+    	    'user' => 'required',
     	   	'idPermissionType' => 'required|numeric|exists:permission_types,id',
     	   	'dueDate' => 'date'
 	    ]);
 
-		$user = User::where('email', $request->user)->firstOrFail();
+		$user = User::where('email', $request->user)->where('isVirtual', false)->first();
 		
+		if($user == null){
+			$user = User::where('name', $request->user)->where('isVirtual', true)->firstOrFail();
+		}
+
 		$share = Share::firstOrNew(['idUser' => $user->id , 'idFile' => $file_id]);
 		
 		if($request->has('dueDate'))
