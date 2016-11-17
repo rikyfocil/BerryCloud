@@ -16,9 +16,11 @@
             <td>
             <div class="btn-group visible-xs-* hidden-xs hidden-sm pull-right" role="group" aria-label="actionGroup">
                 {!! Helper::createButtonWithIcon('GET', ['file.version.download',$file->id, $version->id], "Download Version", "btn btn-default", "glyphicon-download-alt") !!}
-                @if($file->isOwner())
+                @if($file->isOwner() || ( Auth::check() && $file->ensureUserWritePermission(Auth::user()) )) 
                     {!! Helper::createButtonWithIcon('POST', ['file.version.restore', $file->id, $version->id], "Restore this version", "btn btn-default", "glyphicon glyphicon-cloud-upload") !!}
-                    {!! Helper::createButtonWithIcon('DELETE', ['file.version.delete',$file->id, $version->id], "Delete this version", "btn btn-default", "glyphicon-trash") !!}
+                    @if($file->isOwner())
+                        {!! Helper::createButtonWithIcon('DELETE', ['file.version.delete',$file->id, $version->id], "Delete this version", "btn btn-default", "glyphicon-trash") !!}
+                    @endif
                 @endif
             </div>
             <div class="dropdown pull-right hidden-md hidden-lg">
@@ -30,11 +32,11 @@
                 <li>
                     {!! Helper::createButton('GET', ['file.version.download',$file->id, $version->id], "Download Version", "") !!}
                 </li>
-                @if($file->isOwner())
+                @if($file->isOwner() || ( Auth::check() && $file->ensureUserWritePermission(Auth::user()) )) 
                     <li>
                         {!! Helper::createButton('POST', ['file.version.restore', $file->id, $version->id], "Restore this version", "") !!}
                     </li>
-                    @if(Auth::check() && Auth::user()->id == $file->owner)
+                    @if($file->isOwner())
                         <li>
                             {!! Helper::createButton('DELETE', ['file.version.delete',$file->id, $version->id], "Delete this version", "") !!}
                         </li>

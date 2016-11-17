@@ -44,6 +44,10 @@ body{
     width:10em;
 }
 
+.container-fluid{
+    padding:0;
+}
+
 div {
     margin-bottom: 0px;
 }
