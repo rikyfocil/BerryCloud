@@ -34,4 +34,8 @@ class User extends Authenticatable
     public function sharedFiles(){
         return $this->hasMany('App\Share', 'idUser');
     }
+
+     public function permission(){
+        return $this->hasOne('App\UserType', 'id', 'idUserType');
+    }
 }
