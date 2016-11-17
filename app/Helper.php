@@ -20,7 +20,7 @@ class Helper
 		echo FormFacade::close();
 	}
 
-	static function createButtonWithIcon($method, $route, $submit = "submit" , $class = "", $icon="")
+	static function createButtonWithIcon($method, $route, $submit = "submit" , $class = "", $icon="", $tip="")
 	{
 		echo FormFacade::open([
 			'method' => $method,
@@ -29,7 +29,20 @@ class Helper
 		]);
         echo FormFacade::button('<span class="glyphicon '. $icon . '"></span>', 
             array('class'=>'btn btn-default' . $class, 
-            'type'=>'submit'));
+            'type'=>'submit', 'data-toggle'=>'tooltip', 'data-placement'=>'bottom','title'=>''.$submit));
+		echo FormFacade::close();
+	}
+
+	static function createButtonAction($method, $route, $submit = "submit" , $class = "")
+	{
+		echo FormFacade::open([
+			'method' => $method,
+			'route' => $route,
+            'class' => "fileListFormAction"
+		]);
+		echo FormFacade::submit($submit, [
+			'class' => "btn action-button" . $class
+		]);
 		echo FormFacade::close();
 	}
 }
