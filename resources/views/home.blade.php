@@ -4,6 +4,10 @@
     <link href="{{ elixir('css/basic.css') }}" rel="stylesheet">
 @endpush
 
+@push('scripts')
+    <script src="{{ asset('/js/share.js') }}"></script>
+@endpush
+
 @section('content')
 
 
@@ -28,7 +32,9 @@
 
 @include('includes.modal-upload')
 @include('includes.modal-folder')
-
+@if(isset($parent))
+    @include('includes.modal-share-file')
+@endif
 @endsection
 
 @push('scripts')

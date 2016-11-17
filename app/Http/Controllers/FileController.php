@@ -548,7 +548,6 @@ class FileController extends Controller{
 		}
 
         return redirect()->route('file.show',$file_id);
-		// return ['id' => $share->id, 'email' => $user->email, 'name' => $share->permissionType()->first()->name, 'dueDate' => $share->dueDate, 'share_type' => $share->idPermissionType];
 	}
 
 	// Delete sharing
@@ -680,8 +679,6 @@ class FileController extends Controller{
         } else {
             return redirect()->route('home');
         }
-		// return redirect()->route('home');
-		// return ['message' => 'Ok', 'success' => $success];
 	}
 
 }

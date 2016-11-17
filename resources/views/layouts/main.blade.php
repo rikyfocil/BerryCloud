@@ -6,6 +6,7 @@
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400" rel="stylesheet">
     @stack('css')
     <link rel="stylesheet" href="{{ asset('fontawsome/css/font-awesome.min.css') }}">
+    <link href="{{ asset('css/jquery-ui.css') }}" rel="stylesheet">
     <link href="{{ elixir('css/style.css') }}" rel="stylesheet">
 
     

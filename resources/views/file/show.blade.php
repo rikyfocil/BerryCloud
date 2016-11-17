@@ -1,7 +1,6 @@
 @extends('layouts.main')
 
 @push('css')
-    <link href="{{ asset('css/jquery-ui.css') }}" rel="stylesheet">
     <link href="{{ elixir('css/basic.css') }}" rel="stylesheet">
 @endpush
 
