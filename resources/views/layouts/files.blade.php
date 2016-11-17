@@ -22,6 +22,11 @@
                         {!! Helper::createButtonWithIcon('POST', ['file.restore', $file->id], "Restore this File", "btn btn-default", "glyphicon-cloud-upload") !!}
                     @endif
             </div>
+            <div class="dropdown pull-right hidden-md hidden-lg">
+                @if($file->isOwner())
+                    {!! Helper::createButtonWithIcon('POST', ['file.restore', $file->id], "Restore this File", "btn btn-default", "glyphicon-cloud-upload") !!}
+                @endif
+            </div>
             </td>
         @else
             <td><i class="fa {{ $file-> isFolder ? "fa-folder" : "fa-file" }}" id="file-icon"></i> <a href="{{route('file.show', $file->id)}}">{{$file->name}}</a></td>
