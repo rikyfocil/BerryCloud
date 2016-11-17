@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 
 class File extends Model {     
 
@@ -76,5 +77,25 @@ class File extends Model {
             return $this->updated_at;
 
         return $this->versions()->orderBy('updated_at','desc')->first()->updated_at;
+
     }
+
+    
+    public function hierarchy(){
+
+        $hierarchy = [$this];
+        $file = $this;
+
+        while($file->parent){
+            $file = $file->parent()->first();
+            array_unshift($hierarchy, $file);
+        }
+
+        return $hierarchy;
+    }
+
+    public function isOwner() {
+        return Auth::check() && $this->owner()->first()->id == Auth::user()->id;
+    }
+
 }

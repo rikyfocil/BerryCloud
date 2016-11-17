@@ -6,7 +6,7 @@
   </tr>
   @foreach ($files as $file)
       <tr>
-          <td><i class="fa {{ $file-> isFolder ? "fa-folder" : "fa-file" }}"></i> <a href="{{route('file.show', $file->id)}}">{{$file->name}}</a></td>
+          <td><i class="fa {{ $file-> isFolder ? "fa-folder" : "fa-file" }}" id="file-icon"></i> <a href="{{route('file.show', $file->id)}}">{{$file->name}}</a></td>
           <td class="text-right hidden-xs">
               {{ $file->currentVersion() }}
           </td>
@@ -21,10 +21,10 @@
                   <span class="caret"></span>
               </button>
               <ul class="dropdown-menu dropdown-menu-right mobileActionId" aria-labelledby="mobileActionId">
-                  <li>{!! Helper::createButton('GET', ['file.download',$file->id], "Download", "") !!}</li>
-                  @if(Auth::check() && Auth::user()->id == $file->owner)
-                   <li>{!! Helper::createButton('DELETE', ['file.delete', $file->id], "Delete", "") !!}</li>
-                  @endif
+                    <li>{!! Helper::createButton('GET', ['file.download',$file->id], "Download", "") !!}</li>
+                    @if(Auth::check() && Auth::user()->id == $file->owner)
+                        <li>{!! Helper::createButton('DELETE', ['file.delete', $file->id], "Delete", "") !!}</li>
+                    @endif
               </ul>
           </div>
           </td>

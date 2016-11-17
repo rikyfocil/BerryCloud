@@ -547,7 +547,7 @@ class FileController extends Controller{
 			abort(500);
 		}
 
-		return ['id' => $share->id, 'email' => $user->email, 'name' => $share->permissionType()->first()->name, 'dueDate' => $share->dueDate, 'share_type' => $share->idPermissionType];
+        return redirect()->route('file.show',$file_id);
 	}
 
 	// Delete sharing
@@ -673,7 +673,11 @@ class FileController extends Controller{
 			Log::critical("Could not create folder. Please debug");
 		}
 
-		return ['message' => 'Ok', 'success' => $success];
+        if ($parent) {
+            return redirect()->route('file.show',$parent);
+        } else {
+            return redirect()->route('home');
+        }
 	}
 
 }

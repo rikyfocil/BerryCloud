@@ -4,19 +4,20 @@
     <link href="{{ elixir('css/basic.css') }}" rel="stylesheet">
 @endpush
 
+@push('scripts')
+    <script src="{{ asset('/js/share.js') }}"></script>
+@endpush
+
 @section('content')
 
+
+@include('includes.breadcrumb')
+
+
 @if (count($files) != 0)
-    <div class="col-sm-12 col-md-10 col-md-offset-1" id="file-navbar">
-        <!-- <a href="{{route('uploadGet')}}" class="btn btn&#45;success" id="new&#45;file&#45;button">Nuevo</a> -->
-        <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#modal-upload">
-            Nuevo
-        </button>
-    </div>
     <div class="col-sm-12 col-md-10 col-md-offset-1">
         @include('layouts.files')
     </div>
-
 
 @else
     <div class="jumbotron text-center" id="no-files">
@@ -31,8 +32,10 @@
 
 
 @include('includes.modal-upload')
-
-
+@include('includes.modal-folder')
+@if(isset($parent))
+    @include('includes.modal-share-file')
+@endif
 @endsection
 
 @push('scripts')

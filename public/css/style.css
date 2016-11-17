@@ -1,3 +1,16 @@
+a {
+    color: #A62020;
+}
+
+.action-button, .action-button:hover {
+    background: none;
+    border: 1px solid #A62020;
+    margin: .5em 0;
+    padding: .5em .75em;
+    color: #A62020;
+    width: 100%;
+}
+
 body{
     font-family:'Lato', sans-serif;
     font-size:16px;
@@ -5,17 +18,21 @@ body{
     background: #efefef;
 }
 
-h1,h2,h3,h4,h5,h6 {
-    font-weight:300;
+
+.breadcrumbs {
+    margin-top: 2em;
+    text-align: center;
 }
 
-#register-button{
-    background: none;
-    border: 0.3em solid #fff;
-    color: #fff;
-    margin: 1.5em auto;
-    padding: 1em 5em;
-    text-transform: uppercase;
+.breadcrumbs a {
+    color: #A62020;
+    font-size: 1.2em;
+    margin: 0 0.5em;
+}
+
+.breadcrumbs > a:last-child {
+    color: #777;
+    text-decoration: underline;
 }
 
 .circle {
@@ -27,32 +44,48 @@ h1,h2,h3,h4,h5,h6 {
     width:10em;
 }
 
-
-.container-fluid {
-    padding: 0;
-}
-
-.dz-message {
-    padding-top: 5em;
+div {
+    margin-bottom: 0px;
 }
 
 .dropzone .dz-preview{
     width: 80%;
 }
 
-.feats {
+.dz-message {
+    padding-top: 5em;
+}
+
+.feats{
     height: 50vh;
     margin: 1.5em auto;
     padding-top: 2em;
 }
 
+#file-icon {
+    padding-right: .5em;
+}
 
 .fileListForm > .btn-default {
     border: none;
 }
 
+.fileListFormAction{
+    width: 100%;
+}
+
 #file-navbar {
     margin: 2em 0;
+}
+
+.form-control:focus{
+    border-color: #A62020;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(166,32,32,.6)
+}
+
+.form-name {
+    margin: 4em auto;
+    width: 75%;
 }
 
 .glyph-welcome {
@@ -61,24 +94,22 @@ h1,h2,h3,h4,h5,h6 {
     margin: 25% auto;
 }
 
+h1,h2,h3,h4,h5,h6 {
+    font-weight:300;
+}
+
+#icon-file-show {
+    font-size: 10em;
+    margin: .3em 0;
+}
 
 .mobileActionId{
     padding: 0;
 }
 
-
 #mobileUploadForm {
     background: rgba(255,255,255,0.2);
     height: 50vh;
-}
-#welcome-jumbotron {
-    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('../img/action.jpeg');
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
-    background-size: cover;
-    height: 100vh;
-    color:#fff;
 }
 
 
@@ -110,7 +141,6 @@ h1,h2,h3,h4,h5,h6 {
     width: 100%;
 }
 
-
 .navbar {
     background-color:#fff;
     font-size:1.2em;
@@ -118,20 +148,35 @@ h1,h2,h3,h4,h5,h6 {
     padding:1em 0;
 }
 
-
-
 .navbar ul {
     padding: 0 1em;
 }
+
 .navbar-brand > img{
     height: 3em;
     margin: -1em 0 0 2em;
+}
+
+#register-button{
+    background: none;
+    border: 0.3em solid #fff;
+    color: #fff;
+    margin: 1.5em auto;
+    padding: 1em 5em;
+    text-transform: uppercase;
 }
 
 #submit-all {
     width: 100%;
 }
 
+#submit-folder {
+    background: none;
+    border: 1px solid #A62020;
+    color: #A62020;
+    margin: 2em 12.5%;
+    width: 75%;
+}
 
 #think {
     height:60vh;
@@ -175,9 +220,35 @@ th {
     background: #fff;
 }
 
+.toggle-button, .toggle-button:hover{
+    font-size: 1em;
+    float: right;
+    width: 100%;
+}
+
+.ui-autocomplete {
+    background: #fff;
+    z-index: 50000;
+}
+
+#version-table {
+    margin-top: 2em;
+}
+
 #welcome_info {
     margin-top: 15%;
 }
+
+#welcome-jumbotron {
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('../img/action.jpeg');
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    height: 100vh;
+    color:#fff;
+}
+
 
 @media (min-width: 768px) {
     #new-file-button{
@@ -189,6 +260,16 @@ th {
 }
 
 @media (min-width: 1024px){
+    .action-button, .action-button:hover{
+        margin-top:2em;
+
+    }
+    .breadcrumbs {
+        margin-top: 2em;
+        margin-bottom: 2em;
+        text-align: left;
+    }
+
     .fileListForm {
         display: inline-block;
         float:left;
@@ -284,3 +365,7 @@ th {
 .login-form-1 .login-button.clicked.error {
   color: #e74c3c;
 }
+
+
+
+
