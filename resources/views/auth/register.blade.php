@@ -63,10 +63,6 @@
                     </span>
                 @endif
         </div>
-
-        <div class="form-group login-group-checkbox">
-          <input type="checkbox" class="" id="reg_agree" name="reg_agree">
-        </div>
       </div>
       <button type="submit" class="login-button"> <p>&#10217;</p> </button>
     </div>
