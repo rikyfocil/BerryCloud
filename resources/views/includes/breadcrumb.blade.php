@@ -13,7 +13,7 @@
             @endforeach
         @endif
     </div>
-    @if( Route::current()->getUri() != 'shared' || Route::current()->getUri() != 'trash')
+    @if( Route::current()->getUri() != 'shared' && Route::current()->getUri() != 'trash')
         @if(isset($parent))
             <div class="col-xs-6 col-sm-6 col-md-2">
                 <button type="button" class="btn action-button pull-right" data-toggle="modal" data-target="#modal-share">
