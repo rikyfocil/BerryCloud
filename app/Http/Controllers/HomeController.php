@@ -52,7 +52,7 @@ class HomeController extends Controller
 
     public function trash()
     {
-        $userFiles = File::onlyTrashed()->where('owner', Auth::user()->id)->where('parent', null)->get();
+        $userFiles = File::onlyTrashed()->where('owner', Auth::user()->id)->get();
 
         return view('home', ['files' => $userFiles]);
     }
