@@ -23,7 +23,7 @@
     </div>
     </div>
     <div class="row">
-        @if($file->isOwner())
+        @if($file->isOwner() && ( Auth::check() && $file-> ensureUserWritePermission(Auth::user()) ))
             <div class="col-xs-12 col-sm-4">
                 {!! Helper::createButtonAction('GET', ['file.download',$file->id], "Download", "") !!}
             </div>
@@ -50,6 +50,15 @@
             <div class="col-xs-12 col-sm-4">
                 <button type="button" class="btn action-button pull-right" data-toggle="modal" data-target="#modal-share">
                     Share With Someone
+                </button>
+            </div>
+        @elseif( $file-> ensureUserWritePermission(Auth::user()) )
+            <div class="col-xs-12 col-sm-6">
+                {!! Helper::createButtonAction('GET', ['file.download',$file->id], "Download", "") !!}
+            </div>
+            <div class="col-xs-12 col-sm-6">
+                <button type="button" class="btn action-button pull-right" data-toggle="modal" data-target="#modal-new-version">
+                    Upload File
                 </button>
             </div>
         @else

@@ -97,4 +97,7 @@ class File extends Model {
         return Auth::check() && $this->owner()->first()->id == Auth::user()->id;
     }
 
+    public function ensureUserWritePermission(User $user) {
+        return true;
+    }
 }
