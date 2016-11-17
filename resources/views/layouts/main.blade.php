@@ -53,6 +53,8 @@
             <ul class = "nav navbar-nav navbar-right">
 
                 <li><a href = "{{route('home')}}">Home</a></li>
+                <li><a href = "{{route('shared')}}">Shared With Me</a></li>
+                <li><a href = "{{route('trash')}}">Trash</a></li>
                 <li>
                     <a href="{{ route('logout') }}"
                                 onclick="event.preventDefault();

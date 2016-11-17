@@ -17,6 +17,7 @@ Route::get('/', function () {
 
 Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/shared', 'HomeController@sharedWith')->name('shared');
+Route::get('/trash', 'HomeController@trash')->name('trash');
 
 Route::get('/users_complete', 'UsersController@usersLike');
 
