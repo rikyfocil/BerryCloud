@@ -12,7 +12,9 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+	if(!Auth::check())
+    	return view('welcome');
+    return redirect()->route('home');
 })->name('/');
 
 Route::get('/home', 'HomeController@index')->name('home');
@@ -20,6 +22,7 @@ Route::get('/shared', 'HomeController@sharedWith')->name('shared');
 Route::get('/trash', 'HomeController@trash')->name('trash');
 
 Route::get('/users_complete', 'UsersController@usersLike');
+Route::get('/users_parcial', 'UsersController@usersOnlyLike');
 
 Route::group(['prefix' => 'file'], function () {
 
@@ -58,6 +61,15 @@ Route::group(['prefix' => 'folder'], function () {
 	Route::post('create', 'FileController@createFolder')->name('folder.create');
 
 });
+
+
+Route::post('{group_id}/member', 'GroupController@addMember')->name('groups.member.add');
+Route::delete('{group_id}/member/{member_id}', 'GroupController@removeMember')->name('groups.member.delete');
+
+Route::resource('groups', 'GroupController', ['except' => [
+    'edit', 'create'
+]]);
+
 
 // Authentication Routes...
 Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');

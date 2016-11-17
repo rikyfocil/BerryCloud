@@ -54,6 +54,7 @@
 
                 <li><a href = "{{route('home')}}">Home</a></li>
                 <li><a href = "{{route('shared')}}">Shared With Me</a></li>
+                <li><a href = "{{route('groups.index')}}">Groups</a></li>
                 <li><a href = "{{route('trash')}}">Trash</a></li>
                 <li>
                     <a href="{{ route('logout') }}"
