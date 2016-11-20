@@ -5,8 +5,8 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400" rel="stylesheet">
     @stack('css')
-    <link href="{{ asset('css/jquery-ui.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('fontawsome/css/font-awesome.min.css') }}">
+    <link href="{{ asset('css/jquery-ui.css') }}" rel="stylesheet">
     <link href="{{ elixir('css/style.css') }}" rel="stylesheet">
 
     
@@ -53,6 +53,9 @@
             <ul class = "nav navbar-nav navbar-right">
 
                 <li><a href = "{{route('home')}}">Home</a></li>
+                <li><a href = "{{route('shared')}}">Shared With Me</a></li>
+                <li><a href = "{{route('groups.index')}}">Groups</a></li>
+                <li><a href = "{{route('trash')}}">Trash</a></li>
                 <li>
                     <a href="{{ route('logout') }}"
                                 onclick="event.preventDefault();
@@ -107,4 +110,5 @@
     @stack('scripts')
 
 </body>
+
 </html>

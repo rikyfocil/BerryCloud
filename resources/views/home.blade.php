@@ -4,6 +4,10 @@
     <link href="{{ elixir('css/basic.css') }}" rel="stylesheet">
 @endpush
 
+@push('scripts')
+    <script src="{{ asset('/js/share.js') }}"></script>
+@endpush
+
 @section('content')
 
 
@@ -13,6 +17,14 @@
 @if (count($files) != 0)
     <div class="col-sm-12 col-md-10 col-md-offset-1">
         @include('layouts.files')
+    </div>
+@elseif( Route::current()->getUri() == 'shared')
+    <div class="jumbotron text-center" id="no-files">
+        <h1>Your have no shared files.</h1>
+    </div>
+@elseif (Route::current()->getUri() == 'trash')
+    <div class="jumbotron text-center" id="no-files">
+        <h1>Your have no files in the trash.</h1>
     </div>
 @else
     <div class="jumbotron text-center" id="no-files">
@@ -28,7 +40,9 @@
 
 @include('includes.modal-upload')
 @include('includes.modal-folder')
-
+@if(isset($parent))
+    @include('includes.modal-share-file')
+@endif
 @endsection
 
 @push('scripts')

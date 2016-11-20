@@ -35,7 +35,18 @@ class User extends Authenticatable
         return $this->hasMany('App\Share', 'idUser');
     }
 
+
      public function permission(){
         return $this->hasOne('App\UserType', 'id', 'idUserType');
+
     }
-}
+
+    public function groupMemberships(){
+        return $this->hasMany('App\Member', 'idMember');
+    }
+
+    public function ownedGroups(){
+        return $this->hasMany('App\Group', 'idOwner');
+
+    }
+

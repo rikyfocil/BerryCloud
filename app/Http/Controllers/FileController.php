@@ -63,87 +63,17 @@ class FileController extends Controller{
 
 	private function ensureUserReadPermission(\App\File $file) {
 	  	
-	  	if($this->ensureUserReadPermissionToSingleFile($file)){
-	  		return true;
-	  	}
-
-	  	$parent = $file->parent()->first();
-	  	if($parent != null){
-	  		return $this->ensureUserReadPermission($parent);
-	  	}
-
-	  	return false;
-	  	
+		return $file->ensureUserReadPermission(Auth::user());
  	}
 
-	private function ensureUserReadPermissionToSingleFile(\App\File $file) {
-
-		if($file->publicRead)
-	  		return true;
-
-	  	if($this->ensureUserOwnerPermission($file))
-	  		return true;
-
-	  	if(Auth::check()){
-	  		$id = Auth::user()->id;
-	  		// We search for not expired shares
-	  		if(Share::where('idFile', $file->id)->where('idUser', $id)
-	  			->where('dueDate', '>', Carbon::now())->exists())
-	  				return true;
-	  		
-	  		// Last we check for not expiring shares
-	  		if(Share::where('idFile', $file->id)->where('idUser', $id)
-	  			->where('dueDate', null)->exists())
-	  				return true;
-
-		} // Auth::check
-
-  		return false;
-	}
-
-
 	private function ensureUserWritePermission(\App\File $file) {
-
-		if($this->ensureUserWritePermissionToSingleFile($file)){
-	  		return true;
-	  	}
-
-	  	$parent = $file->parent()->first();
-	  	if($parent != null){
-	  		return $this->ensureUserWritePermissionToSingleFile($parent);
-	  	}
-
-	  	return false;
 		
+		if(!Auth::check())
+			return false;
+		
+		return $file->ensureUserWritePermission(Auth::user());
 	}
 
-	private function ensureUserWritePermissionToSingleFile(\App\File $file){
-
-		if($this->ensureUserOwnerPermission($file))
-	  		return true;  	
-
-	  	if(!Auth::check() || !$this->ensureUserReadPermission($file))
-	  		return false;
-
-		$id = Auth::user()->id;
-
-		$share = Share::where('idFile', $file->id)
-			->where('idUser', $id)->where('dueDate', '>', Carbon::now())->first();
-
-		// We search for not expired shares
-		if( $share != null && $share->permissionType()->first()->hasWritePermission() )
-				return true;
-		  	
-	  	$share = Share::where('idFile', $file->id)->where('idUser', $id)
-	  			->where('dueDate', null)->first();
-	  	
-	  	// Last we check for not expiring shares
-	  	if($share != null && $share->permissionType()->first()->hasWritePermission())
-	  		return true;
-
-	  	return false;
-
-	}
 
 	private function ensureUserOwnerPermission(\App\File $file) {
   	
@@ -515,7 +445,16 @@ class FileController extends Controller{
 		if(!$this->ensureUserOwnerPermission($file))
 			abort(403);
 
-		$shares =  DB::table('shares')->join('permission_types', 'shares.idPermissionType', 'permission_types.id')->join('users', 'shares.idUser', 'users.id')->select('shares.id', 'users.email', 'permission_types.name', 'shares.dueDate', 'shares.idPermissionType as share_type')->where('shares.idFile', $file_id)->get();
+		$shares =  DB::table('shares')->join('permission_types', 'shares.idPermissionType', 'permission_types.id')->join('users', 'shares.idUser', 'users.id')->select('shares.id', 'users.email', 'users.name as uname', 'permission_types.name', 'shares.dueDate', 'shares.idPermissionType as share_type', 'users.isVirtual')->where('shares.idFile', $file_id)->get();
+
+		foreach ($shares as $share) {
+
+			if($share->isVirtual)
+				$share->email = $share->uname;
+			
+			$share->uname = null;
+		}
+
 
 		return $shares;
 	}
@@ -528,13 +467,17 @@ class FileController extends Controller{
 			abort(403);
 
 		$this->validate($request, [
-    	    'user' => 'required|exists:users,email',
+    	    'user' => 'required',
     	   	'idPermissionType' => 'required|numeric|exists:permission_types,id',
     	   	'dueDate' => 'date'
 	    ]);
 
-		$user = User::where('email', $request->user)->firstOrFail();
+		$user = User::where('email', $request->user)->where('isVirtual', false)->first();
 		
+		if($user == null){
+			$user = User::where('name', $request->user)->where('isVirtual', true)->firstOrFail();
+		}
+
 		$share = Share::firstOrNew(['idUser' => $user->id , 'idFile' => $file_id]);
 		
 		if($request->has('dueDate'))
@@ -547,7 +490,7 @@ class FileController extends Controller{
 			abort(500);
 		}
 
-		return ['id' => $share->id, 'email' => $user->email, 'name' => $share->permissionType()->first()->name, 'dueDate' => $share->dueDate, 'share_type' => $share->idPermissionType];
+        return redirect()->route('file.show',$file_id);
 	}
 
 	// Delete sharing
@@ -673,14 +616,11 @@ class FileController extends Controller{
 			Log::critical("Could not create folder. Please debug");
 		}
 
-
         if ($parent) {
             return redirect()->route('file.show',$parent);
         } else {
             return redirect()->route('home');
         }
-		// return redirect()->route('home');
-		// return ['message' => 'Ok', 'success' => $success];
 	}
 
 }

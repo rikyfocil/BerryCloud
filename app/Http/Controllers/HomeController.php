@@ -44,9 +44,18 @@ class HomeController extends Controller
 
         foreach ($sharedWithMe as $currentShare) {
             $file = $currentShare->file()->first();
-            array_push($fileArray, $file);
+
+            if($file)
+                array_push($fileArray, $file);
         }
 
         return view('home', ['files' => $fileArray]);
+    }
+
+    public function trash()
+    {
+        $userFiles = File::onlyTrashed()->where('owner', Auth::user()->id)->get();
+
+        return view('home', ['files' => $userFiles]);
     }
 }
