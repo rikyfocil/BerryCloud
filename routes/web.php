@@ -11,9 +11,6 @@
 |
 */
 
-use App\User;
-use Illuminate\Http\Request;
-
 Route::get('/', function () {
 	if(!Auth::check())
     	return view('welcome');
@@ -27,17 +24,9 @@ Route::get('/trash', 'HomeController@trash')->name('trash');
 Route::get('/users_complete', 'UsersController@usersLike');
 Route::get('/users_parcial', 'UsersController@usersOnlyLike');
 
-Route::get('permission',function () {
-    return view('permissions', ['users' => User::with("permission"
-)->get()]);
-});
+Route::get('/permissions', 'PermissionsController@getUser')->name('getUser');
+Route::put('/permissions/{id}', 'PermissionsController@changePermission')->name('changePermission');
 
-Route::put('permission/{id}',function (Request $request, $id) {
-	$change_permission = App\User::find($id);
-	$change_permission->idUserType = $request["permission"];
-	$change_permission->save();
-	return Redirect::to("permission");
-});
 
 Route::group(['prefix' => 'file'], function () {
 

@@ -13,12 +13,15 @@
 			<tbody>
 				<td>{{$user->name}}</td>
 				<td>{{$user->email}}</td>
-				{{ Form::open(array('url' => 'permission/' . $user->id)) }}
+				{{ Form::open(array('url' => 'permissions/' . $user->id)) }}
 				<td>
+
+					
+
 					<select name ="permission">
-						<option {{ $user->permission->id == 1? "selected" :""}} value="1">Standard</option>
-						<option {{ $user->permission->id == 2? "selected" :""}} value="2">Administrative</option>
-						<option {{ $user->permission->id == 3? "selected" :""}} value="3">Root</option>
+						@foreach($permission_types as $p_types )
+							<option {{ $user->idUserType == $p_types->id? "selected" :""}} value="{{$p_types->id}}">{{$p_types->name}}</option>
+						@endforeach
 					<select>
 								
 				</td>
