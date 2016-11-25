@@ -22,7 +22,6 @@ use Illuminate\Support\Facades\DB;
 // $checked = $request->has('newsletter') ? true: false;
 
 class FileController extends Controller{
-
 	  /*
 	  This method is provided to make sure that the user has a folder before
 	  performing operations on it. This method should always return true and
