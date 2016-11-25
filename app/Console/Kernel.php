@@ -13,6 +13,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
+      'App\Console\Commands\DeleteOldVersions',
+
         //
     ];
 
@@ -26,6 +28,8 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')
         //          ->hourly();
+        $schedule->command('db:DeleteOld')->everyMinute();
+        //$schedule->call('\App\Http\Controllers\FileController@deleteOldVersions')->everyMinute();
     }
 
     /**
