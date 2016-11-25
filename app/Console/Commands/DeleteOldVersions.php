@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use DB;
 use Carbon\Carbon;
+use Auth;
 
 class DeleteOldVersions extends Command
 {
@@ -37,7 +38,9 @@ class DeleteOldVersions extends Command
      */
     public function handle()
     {
-        \Log::info('Erasing old versions of files.');
+        //We must be logged in with root account to execute the function.
+        Auth::attempt(['email'=> 'root@example.com', 'password' => 'rootPassword']);
+        \Log::info('Cleanning script running.');
         //We get all info form table files
         $files = DB::table('files')->get();
         //Getting the local time with carbon
@@ -53,7 +56,7 @@ class DeleteOldVersions extends Command
             $file1 = \App\File::where('id', $id)->firstOrFail();
             $fileAge = $now - strtotime($file1->created_at);
 
-            if ($fileAge > 3600) { //Temporary check for test...One hour
+            if ($fileAge > 31536000 ) { //Check for one year = 31536000
                 $versions = DB::table('versions')
                     ->where('idFile', '=', $file1->id)
                     ->get();
@@ -64,9 +67,7 @@ class DeleteOldVersions extends Command
                     $version = \App\Version::where('id', $v->id)->firstOrFail();
 
                     $versionAge = $now - strtotime($v->created_at);
-                    \Log::info('Version ID = '.$v->id);
-                    \Log::info('Version Age = '.$versionAge);
-                    if ($versionAge > 360) {
+                    if ($versionAge > 31536000) {
                         // Now we validate that there is at least 2 versions
                         if ($file1->versions()->count() > 1) {
                           // As usual, we cross check the version with the file
@@ -78,14 +79,12 @@ class DeleteOldVersions extends Command
                                 Log::alert('Could not delete version '.$version->id);
                                 abort(500);
                             }
-
+                            \Log::info('Version with ID = '.$v->id . ' was deleted by system.');
                             $version->delete();
                         }
                     }
                 }
-                \Log::info('////////');
             }
         }
-          \Log::info(' ');
     }
 }
