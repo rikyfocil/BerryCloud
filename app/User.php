@@ -37,7 +37,8 @@ class User extends Authenticatable
 
 
      public function permission(){
-        return $this->hasOne('App\UserType', 'id', 'idUserType');
+    
+        return $this->belongsTo('App\UserType', 'idUserType');
 
     }
 

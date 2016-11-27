@@ -17,6 +17,8 @@ Route::get('/', function () {
     return redirect()->route('home');
 })->name('/');
 
+
+
 Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/shared', 'HomeController@sharedWith')->name('shared');
 Route::get('/trash', 'HomeController@trash')->name('trash');
