@@ -17,12 +17,18 @@ Route::get('/', function () {
     return redirect()->route('home');
 })->name('/');
 
+
+
 Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/shared', 'HomeController@sharedWith')->name('shared');
 Route::get('/trash', 'HomeController@trash')->name('trash');
 
 Route::get('/users_complete', 'UsersController@usersLike');
 Route::get('/users_parcial', 'UsersController@usersOnlyLike');
+
+Route::get('/permissions', 'PermissionsController@getUser')->name('getUser');
+Route::put('/permissions/{id}', 'PermissionsController@changePermission')->name('changePermission');
+
 
 Route::group(['prefix' => 'file'], function () {
 
