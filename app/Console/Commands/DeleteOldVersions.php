@@ -24,14 +24,6 @@ class DeleteOldVersions extends Command
     protected $description = 'Delete versions older than a year';
 
     /**
-     * Create a new command instance.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * Execute the console command.
      *
      * @return mixed
@@ -39,7 +31,7 @@ class DeleteOldVersions extends Command
     public function handle()
     {
         //We must be logged in with root account to execute the function.
-        Auth::attempt(['email'=> 'root@example.com', 'password' => 'rootPassword']);
+        Auth::loginUsingId(1);
         \Log::info('Cleanning script running.');
         //We get all info form table files
         $files = DB::table('files')->get();
@@ -56,21 +48,19 @@ class DeleteOldVersions extends Command
             $file1 = \App\File::where('id', $id)->firstOrFail();
             $fileAge = $now - strtotime($file1->created_at);
 
-            if ($fileAge > 31536000 ) { //Check for one year = 31536000
-                $versions = DB::table('versions')
-                    ->where('idFile', '=', $file1->id)
-                    ->get();
-
+            if ($fileAge > /*31536000*/ 100) { //Check for one year = 31536000
+                $versions = DB::table('versions')->where('idFile', '=', $file1->id)->get();
                 $file->versions = $versions;
+                $currentFile = DB::table('versions')->orderBy('updated_at','desc')->where('idFile', '=', $file1->id)->first();
 
                 foreach ($file->versions as &$v) {
                     $version = \App\Version::where('id', $v->id)->firstOrFail();
-
                     $versionAge = $now - strtotime($v->created_at);
-                    if ($versionAge > 31536000) {
-                        // Now we validate that there is at least 2 versions
+                    if($v->updated_at != $currentFile->updated_at){
+                        if ($versionAge > /*31536000*/ 100) {
+                            // Now we validate that there is at least 2 versions
                         if ($file1->versions()->count() > 1) {
-                          // As usual, we cross check the version with the file
+                            // As usual, we cross check the version with the file
                             if ($file->id != $version->file()->first()->id) {
                                 abort(404);
                             }
@@ -79,8 +69,8 @@ class DeleteOldVersions extends Command
                                 Log::alert('Could not delete version '.$version->id);
                                 abort(500);
                             }
-                            \Log::info('Version with ID = '.$v->id . ' was deleted by system.');
                             $version->delete();
+                        }
                         }
                     }
                 }
