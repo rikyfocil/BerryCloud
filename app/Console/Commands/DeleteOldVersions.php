@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use DB;
 use Carbon\Carbon;
 use Auth;
+use App\File;
 
 class DeleteOldVersions extends Command
 {
@@ -34,7 +35,7 @@ class DeleteOldVersions extends Command
         Auth::loginUsingId(1);
         \Log::info('Cleanning script running.');
         //We get all info form table files
-        $files = DB::table('files')->get();
+        $files = File::all();
         //Getting the local time with carbon
         $now = strtotime(Carbon::now());
 
@@ -43,34 +44,27 @@ class DeleteOldVersions extends Command
         of that file with the same step, check if the version was created since more than a year. If the answer is yes,
         we proceed to delete the version.
         */
-        foreach ($files as &$file) {
+        foreach ($files as $file) {
             $id = $file->id;
-            $file1 = \App\File::where('id', $id)->firstOrFail();
-            $fileAge = $now - strtotime($file1->created_at);
+            $fileAge = $now - strtotime($file->created_at);
 
-            if ($fileAge > /*31536000*/ 100) { //Check for one year = 31536000
-                $versions = DB::table('versions')->where('idFile', '=', $file1->id)->get();
+            if ($file->isFolder) {
+                continue;
+            }
+
+            if ($fileAge > 31536000) { //Check for one year old
+                $versions = $file->versions()->get();
                 $file->versions = $versions;
-                $currentFile = DB::table('versions')->orderBy('updated_at','desc')->where('idFile', '=', $file1->id)->first();
+                $currentVersion = $file->versions()->orderBy('updated_at', 'desc')->first();
 
-                foreach ($file->versions as &$v) {
-                    $version = \App\Version::where('id', $v->id)->firstOrFail();
-                    $versionAge = $now - strtotime($v->created_at);
-                    if($v->updated_at != $currentFile->updated_at){
-                        if ($versionAge > /*31536000*/ 100) {
-                            // Now we validate that there is at least 2 versions
-                        if ($file1->versions()->count() > 1) {
-                            // As usual, we cross check the version with the file
-                            if ($file->id != $version->file()->first()->id) {
-                                abort(404);
-                            }
-
+                foreach ($file->versions as $v) {
+                    $versionAge = $now - strtotime($v->updated_at);
+                    if ($v->id != $currentVersion->id) {
+                        if ($versionAge > 31536000) {
                             if (!$version->delete()) {
-                                Log::alert('Could not delete version '.$version->id);
+                                Log::critical('Could not delete version '.$version->id);
                                 abort(500);
                             }
-                            $version->delete();
-                        }
                         }
                     }
                 }
