@@ -35,16 +35,13 @@ class PermissionsController extends Controller
 			abort(403);
 
 
-		$this->validate($request,[
-				'user'=> 'exists'
+		$this->validate($request, [
+				'permission'=> 'required', 		
 			]);
-		
-		if (!$this)
-			abort(400);
-
+		$new_permission = $request['permission'];
 
 		$change_permission = User::findOrFail($id);
-		$change_permission->idUserType = $request["permission"];
+		$change_permission->idUserType = $new_permission;
 		$change_permission->save();
 
 
