@@ -35,21 +35,12 @@ class HomeController extends Controller
     // The files passed here also recieve the owner parsed
     public function sharedWith()
     {
+        if(!Auth::check())
+            abort(403);
+        
+        $sharedWithMe = Auth::user()->sharedWithMe();
 
-        $sharedWithMe = Share::where('idUser', Auth::user()->id)->where( function($query){ 
-            $query->where('dueDate', null)->orWhere('dueDate', '>', Carbon::now() );
-        } )->get();
-
-        $fileArray = [];
-
-        foreach ($sharedWithMe as $currentShare) {
-            $file = $currentShare->file()->first();
-
-            if($file)
-                array_push($fileArray, $file);
-        }
-
-        return view('home', ['files' => $fileArray]);
+        return view('home', ['files' => $sharedWithMe]);
     }
 
     public function trash()

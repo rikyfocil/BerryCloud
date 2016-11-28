@@ -16,12 +16,12 @@
     </div>
     <div class="row">
     <div class="col-xs-10 col-xs-offset-1">
-        <h3 class="text-center">{{$group->name}}</h3>
+        <h3 class="text-center"><i class="fa fa-groups"></i>{{$group->name}}</h3>
         <p id="group-data" data-id="{{$group->id}}" hidden></p>
     </div>
     </div>
     <div class="row">
-        <div class="col-xs-12 col-sm-5 col-xs-offset-10 col-sm-offset-6">
+        <div class="col-xs-12 col-sm-5 col-xs-offset-10 col-sm-offset-7">
 
             <div class="col-xs-6">
              {!! Helper::createButtonAction('DELETE', ['groups.destroy',$group->id], "Delete", "") !!}
