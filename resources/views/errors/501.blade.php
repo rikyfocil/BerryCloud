@@ -6,7 +6,7 @@
 
 @section('message_content')
     <p>
-        BerryCloud is still in devolpment and this feature is not yet 
+        BerryCloud is still in development and this feature is not yet
         implemented <br> Stay tuned
     </p>
 @endsection
