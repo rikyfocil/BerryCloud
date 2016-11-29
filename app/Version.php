@@ -31,7 +31,7 @@ class Version extends Model
     	$file_id = $file->id;
     	$version_id = $this->id;
 
-    	$count = \App\Version::where('path', $this->path)->count(); 
+    	$count = \App\Version::where('path', $this->path)->count();
     	$removing = ($count == 1);
 
     	if($removing){
